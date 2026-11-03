@@ -9,7 +9,6 @@ types.setTypeParser(types.builtins.DATE, (valor) => valor);
 export class BancoService implements OnModuleDestroy {
   private pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
 
-  // Executa um SQL com parâmetros ($1, $2...) e devolve as linhas.
   async consultar<T = any>(sql: string, parametros: unknown[] = []): Promise<T[]> {
     const resultado = await this.pool.query(sql, parametros);
     return resultado.rows;

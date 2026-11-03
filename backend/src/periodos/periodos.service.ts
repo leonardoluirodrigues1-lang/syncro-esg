@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { BancoService } from '../banco/banco.service';
 
-export interface Periodo {
+interface Periodo {
   id: string;
   ano: number;
   trimestre: number;
@@ -60,7 +60,6 @@ export class PeriodosService {
     return periodo;
   }
 
-  // Trimestre imediatamente anterior (ou null se for o primeiro).
   async anterior(empresaId: string, periodo: Periodo): Promise<Periodo | null> {
     const [anterior] = await this.banco.consultar<Periodo>(
       `SELECT ${COLUNAS} FROM periodo p

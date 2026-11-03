@@ -4,7 +4,7 @@ import { BancoService } from '../banco/banco.service';
 import { MetasService } from '../metas/metas.service';
 import { PeriodosService } from '../periodos/periodos.service';
 
-export interface ScoresDoPeriodo {
+interface ScoresDoPeriodo {
   periodo_id: string;
   nome: string;
   ambiental: number;
@@ -14,7 +14,7 @@ export interface ScoresDoPeriodo {
 }
 
 // Único cálculo feito no backend: os pesos do score geral.
-export function calcularScoreGeral(ambiental: number, social: number, governanca: number): number {
+function calcularScoreGeral(ambiental: number, social: number, governanca: number): number {
   return Math.round(0.4 * ambiental + 0.3 * social + 0.3 * governanca);
 }
 
@@ -48,7 +48,6 @@ export class PainelService {
     }));
   }
 
-  // Total de kWh e tCO₂e do período (view vw_emissoes).
   async emissoesDoPeriodo(empresaId: string, periodoId: string) {
     const [emissoes] = await this.banco.consultar(
       `SELECT COALESCE(SUM(kwh), 0)::float AS kwh, COALESCE(SUM(tco2e), 0)::float AS tco2e

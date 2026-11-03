@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BancoService } from '../banco/banco.service';
 
-export interface Indicador {
+interface Indicador {
   id: number;
   codigo: string;
   nome: string;

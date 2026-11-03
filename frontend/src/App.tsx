@@ -8,7 +8,6 @@ import Metas from './pages/Metas';
 import Painel from './pages/Painel';
 import Relatorio from './pages/Relatorio';
 
-// Sem token, qualquer tela interna manda para o login.
 function AreaLogada() {
   return lerToken() ? <Layout /> : <Navigate to="/login" replace />;
 }

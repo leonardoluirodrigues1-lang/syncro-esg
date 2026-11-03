@@ -13,7 +13,6 @@ export class AcoesService {
     private periodos: PeriodosService,
   ) {}
 
-  // Lançamentos do período, do mais recente para o mais antigo.
   listar(empresaId: string, periodoId: string) {
     return this.banco.consultar(
       `SELECT a.id, a.indicador_id, i.codigo, i.nome AS indicador, i.pilar, i.unidade,

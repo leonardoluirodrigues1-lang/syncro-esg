@@ -29,7 +29,6 @@ export function sair() {
   window.location.href = '/login';
 }
 
-// Acrescenta ?periodoId=... só quando há um período escolhido.
 export function comPeriodo(caminho: string, periodoId: string) {
   return periodoId ? `${caminho}?periodoId=${periodoId}` : caminho;
 }
@@ -39,7 +38,6 @@ interface Opcoes {
   corpo?: unknown;
 }
 
-// Faz a requisição e devolve o JSON. Em caso de erro, lança a mensagem do backend.
 export async function api<T>(caminho: string, opcoes: Opcoes = {}): Promise<T> {
   const token = lerToken();
   let resposta: Response;
@@ -56,7 +54,6 @@ export async function api<T>(caminho: string, opcoes: Opcoes = {}): Promise<T> {
     throw new Error('Não foi possível conectar ao servidor. Tente novamente.');
   }
 
-  // Token vencido ou inválido: sai e volta para o login.
   if (resposta.status === 401 && token) {
     sair();
     throw new Error('Sua sessão expirou. Faça login novamente.');

@@ -5,8 +5,6 @@ export type Status = 'no_prazo' | 'atencao' | 'em_risco';
 
 export interface Periodo {
   id: string;
-  ano: number;
-  trimestre: number;
   data_inicio: string;
   data_fim: string;
   nome: string;
@@ -20,14 +18,12 @@ export interface Indicador {
   unidade: string;
   direcao: 'reduzir' | 'aumentar';
   agregacao: 'soma' | 'media';
-  obrigatorio: boolean;
   calculado: boolean;
 }
 
 export interface Acao {
   id: string;
   indicador_id: number;
-  codigo: string;
   indicador: string;
   pilar: Pilar;
   unidade: string;
@@ -38,12 +34,9 @@ export interface Acao {
 
 export interface Meta {
   id: string;
-  indicador_id: number;
-  codigo: string;
   indicador: string;
   pilar: Pilar;
   unidade: string;
-  direcao: 'reduzir' | 'aumentar';
   valor_base: number;
   valor_alvo: number;
   valor_atual: number;
@@ -54,7 +47,6 @@ export interface Meta {
 }
 
 export interface Scores {
-  periodo_id: string;
   nome: string;
   ambiental: number;
   social: number;
@@ -63,12 +55,7 @@ export interface Scores {
 }
 
 export interface Perfil {
-  id: string;
-  nome: string;
-  email: string;
-  empresa_id: string;
   empresa: string;
-  cnpj: string;
 }
 
 export interface DadosPainel {

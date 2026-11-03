@@ -43,7 +43,6 @@ export function hojeIso() {
   return new Date().toLocaleDateString('en-CA');
 }
 
-// Id do trimestre que contém a data de hoje.
 export function periodoAtualId(periodos: Periodo[]) {
   const hoje = hojeIso();
   return periodos.find((p) => p.data_inicio <= hoje && hoje <= p.data_fim)?.id ?? periodos[0]?.id ?? '';

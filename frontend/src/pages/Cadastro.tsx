@@ -17,7 +17,6 @@ export default function Cadastro() {
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
 
-  // Atualiza um campo do formulário pelo nome.
   function alterar(campo: keyof typeof dados, valor: string) {
     setDados({ ...dados, [campo]: valor });
   }
@@ -27,7 +26,6 @@ export default function Cadastro() {
     setErro('');
     setEnviando(true);
     try {
-      // Campos opcionais vazios não são enviados.
       const corpo = { ...dados, setor: dados.setor || undefined, porte: dados.porte || undefined };
       const resposta = await api<{ token: string }>('/auth/cadastro', { metodo: 'POST', corpo });
       salvarToken(resposta.token);

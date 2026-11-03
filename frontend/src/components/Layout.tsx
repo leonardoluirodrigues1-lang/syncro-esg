@@ -3,7 +3,6 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { api, sair } from '../api';
 import type { Perfil } from '../tipos';
 
-// Menu lateral + área da página atual.
 export default function Layout() {
   const [perfil, setPerfil] = useState<Perfil | null>(null);
 
