@@ -17,9 +17,10 @@ export class AcoesService {
   listar(empresaId: string, periodoId: string) {
     return this.banco.consultar(
       `SELECT a.id, a.indicador_id, i.codigo, i.nome AS indicador, i.pilar, i.unidade,
-              a.valor::float AS valor, a.data_referencia, a.descricao
+              a.valor::float AS valor, a.data_referencia, a.descricao, e.tco2e::float AS tco2e
        FROM acao_esg a
        JOIN indicador i ON i.id = a.indicador_id
+       LEFT JOIN vw_emissoes e ON e.acao_id = a.id
        WHERE a.empresa_id = $1 AND a.periodo_id = $2
        ORDER BY a.data_referencia DESC, a.criado_em DESC`,
       [empresaId, periodoId],
