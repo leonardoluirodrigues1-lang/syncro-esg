@@ -31,14 +31,14 @@ export class PainelService {
   // A view vw_score_pilar tem uma linha por pilar; aqui viram colunas.
   async scoresPorPeriodo(empresaId: string): Promise<ScoresDoPeriodo[]> {
     const linhas = await this.banco.consultar(
-      `SELECT p.id AS periodo_id, p.trimestre || 'º tri ' || p.ano AS nome,
-              MAX(s.score) FILTER (WHERE s.pilar = 'E') AS ambiental,
-              MAX(s.score) FILTER (WHERE s.pilar = 'S') AS social,
-              MAX(s.score) FILTER (WHERE s.pilar = 'G') AS governanca
+      `SELECT p.id AS periodo_id, CONCAT(p.trimestre, 'º tri ', p.ano) AS nome,
+              MAX(CASE WHEN s.pilar = 'E' THEN s.score END) AS ambiental,
+              MAX(CASE WHEN s.pilar = 'S' THEN s.score END) AS social,
+              MAX(CASE WHEN s.pilar = 'G' THEN s.score END) AS governanca
        FROM periodo p
        JOIN vw_score_pilar s ON s.periodo_id = p.id
-       WHERE p.empresa_id = $1
-       GROUP BY p.id
+       WHERE p.empresa_id = ?
+       GROUP BY p.id, p.trimestre, p.ano, p.data_inicio
        ORDER BY p.data_inicio`,
       [empresaId],
     );
@@ -50,8 +50,8 @@ export class PainelService {
 
   async emissoesDoPeriodo(empresaId: string, periodoId: string) {
     const [emissoes] = await this.banco.consultar(
-      `SELECT COALESCE(SUM(kwh), 0)::float AS kwh, COALESCE(SUM(tco2e), 0)::float AS tco2e
-       FROM vw_emissoes WHERE empresa_id = $1 AND periodo_id = $2`,
+      `SELECT COALESCE(SUM(kwh), 0) AS kwh, COALESCE(SUM(tco2e), 0) AS tco2e
+       FROM vw_emissoes WHERE empresa_id = ? AND periodo_id = ?`,
       [empresaId, periodoId],
     );
     return emissoes;

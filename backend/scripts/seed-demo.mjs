@@ -13,7 +13,8 @@
 // Limite matemático: "Em risco" exige estar mais de 25 pontos atrás do ritmo,
 // o que só é possível depois de ~25% do trimestre (por volta do dia 23).
 import bcrypt from 'bcryptjs';
-import pg from 'pg';
+import { randomUUID } from 'node:crypto';
+import mysql from 'mysql2/promise';
 
 const CNPJ_DEMO = '12345678000190';
 const EMAIL_DEMO = 'demo@syncro.com';
@@ -85,45 +86,52 @@ function calcularTrimestres(hoje) {
   });
 }
 
-const cliente = new pg.Client({ connectionString: process.env.DATABASE_URL });
-await cliente.connect();
+const local = ['localhost', '127.0.0.1'].includes(new URL(process.env.DATABASE_URL).hostname);
+const cliente = await mysql.createConnection({
+  uri: process.env.DATABASE_URL,
+  ssl: local ? undefined : { minVersion: 'TLSv1.2', rejectUnauthorized: true }, // o TiDB exige
+  decimalNumbers: true, // DECIMAL chega como número
+  dateStrings: true, // DATE chega como 'AAAA-MM-DD'
+});
+// Divisões com a mesma precisão usada pela API (ver BancoService).
+await cliente.query('SET SESSION div_precision_increment = 30');
 
 try {
-  await cliente.query('BEGIN');
+  await cliente.beginTransaction();
 
   // Usa a mesma data que as views usam (CURRENT_DATE do banco).
-  const { rows: [{ hoje }] } = await cliente.query('SELECT CURRENT_DATE::text AS hoje');
+  const [[{ hoje }]] = await cliente.query('SELECT CURRENT_DATE AS hoje');
 
   // acao_esg -> periodo é RESTRICT, então os lançamentos saem antes da empresa.
   await cliente.query(
-    'DELETE FROM acao_esg WHERE empresa_id IN (SELECT id FROM empresa WHERE cnpj = $1)',
+    'DELETE FROM acao_esg WHERE empresa_id IN (SELECT id FROM empresa WHERE cnpj = ?)',
     [CNPJ_DEMO],
   );
-  await cliente.query('DELETE FROM empresa WHERE cnpj = $1', [CNPJ_DEMO]);
-  await cliente.query('DELETE FROM usuario WHERE email = $1', [EMAIL_DEMO]);
+  await cliente.query('DELETE FROM empresa WHERE cnpj = ?', [CNPJ_DEMO]);
+  await cliente.query('DELETE FROM usuario WHERE email = ?', [EMAIL_DEMO]);
 
-  const empresa = await cliente.query(
-    `INSERT INTO empresa (nome, cnpj, setor, porte)
-     VALUES ('Padaria Estrela', $1, 'Alimentação', 'micro') RETURNING id`,
-    [CNPJ_DEMO],
+  const empresaId = randomUUID();
+  await cliente.query(
+    `INSERT INTO empresa (id, nome, cnpj, setor, porte)
+     VALUES (?, 'Padaria Estrela', ?, 'Alimentação', 'micro')`,
+    [empresaId, CNPJ_DEMO],
   );
-  const empresaId = empresa.rows[0].id;
 
-  const usuario = await cliente.query(
-    `INSERT INTO usuario (empresa_id, nome, email, senha_hash)
-     VALUES ($1, 'Responsável Demo', $2, $3) RETURNING id`,
-    [empresaId, EMAIL_DEMO, await bcrypt.hash('demo1234', 10)],
+  const usuarioId = randomUUID();
+  await cliente.query(
+    `INSERT INTO usuario (id, empresa_id, nome, email, senha_hash)
+     VALUES (?, ?, 'Responsável Demo', ?, ?)`,
+    [usuarioId, empresaId, EMAIL_DEMO, await bcrypt.hash('demo1234', 10)],
   );
-  const usuarioId = usuario.rows[0].id;
 
-  const indicadores = await cliente.query('SELECT id, codigo FROM indicador');
-  const idDoIndicador = Object.fromEntries(indicadores.rows.map((i) => [i.codigo, i.id]));
+  const [indicadores] = await cliente.query('SELECT id, codigo FROM indicador');
+  const idDoIndicador = Object.fromEntries(indicadores.map((i) => [i.codigo, i.id]));
 
   async function lancar(periodoId, codigo, valor, data, descricao = null) {
     await cliente.query(
-      `INSERT INTO acao_esg (empresa_id, periodo_id, usuario_id, indicador_id, valor, data_referencia, descricao)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [empresaId, periodoId, usuarioId, idDoIndicador[codigo], valor, data, descricao],
+      `INSERT INTO acao_esg (id, empresa_id, periodo_id, usuario_id, indicador_id, valor, data_referencia, descricao)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [randomUUID(), empresaId, periodoId, usuarioId, idDoIndicador[codigo], valor, data, descricao],
     );
   }
 
@@ -131,18 +139,18 @@ try {
 
   // Fração do trimestre atual já decorrida: a mesma conta do ritmo_esperado da view.
   const atual = trimestres[2];
-  const { rows: [{ ritmo }] } = await cliente.query(
-    `SELECT LEAST(GREATEST((CURRENT_DATE - $1::date)::numeric / ($2::date - $1::date), 0), 1)::float AS ritmo`,
-    [atual.inicio, atual.fim],
+  const [[{ ritmo }]] = await cliente.query(
+    'SELECT LEAST(GREATEST(DATEDIFF(CURRENT_DATE, ?) / DATEDIFF(?, ?), 0), 1) AS ritmo',
+    [atual.inicio, atual.fim, atual.inicio],
   );
 
   for (const [indice, t] of trimestres.entries()) {
-    const periodo = await cliente.query(
-      `INSERT INTO periodo (empresa_id, tipo, ano, trimestre, data_inicio, data_fim)
-       VALUES ($1, 'trimestre', $2, $3, $4, $5) RETURNING id`,
-      [empresaId, t.ano, t.trimestre, t.inicio, t.fim],
+    const periodoId = randomUUID();
+    await cliente.query(
+      `INSERT INTO periodo (id, empresa_id, tipo, ano, trimestre, data_inicio, data_fim)
+       VALUES (?, ?, 'trimestre', ?, ?, ?, ?)`,
+      [periodoId, empresaId, t.ano, t.trimestre, t.inicio, t.fim],
     );
-    const periodoId = periodo.rows[0].id;
 
     // Valor mensal de cada indicador neste trimestre.
     const valores = {};
@@ -152,9 +160,9 @@ try {
       valores[codigo] = Math.round((base + progresso * (alvo - base)) * 100) / 100;
 
       await cliente.query(
-        `INSERT INTO meta_esg (empresa_id, periodo_id, indicador_id, valor_base, valor_alvo)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [empresaId, periodoId, idDoIndicador[codigo], base, alvo],
+        `INSERT INTO meta_esg (id, empresa_id, periodo_id, indicador_id, valor_base, valor_alvo)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [randomUUID(), empresaId, periodoId, idDoIndicador[codigo], base, alvo],
       );
     }
     for (const [codigo, porTrimestre] of Object.entries(MENSAIS)) {
@@ -181,29 +189,29 @@ try {
     }
   }
 
-  await cliente.query('COMMIT');
+  await cliente.commit();
 
   // Conferência: lê o resultado direto das views.
-  const metas = await cliente.query(
-    `SELECT m.codigo, ROUND(m.progresso, 2)::float AS progresso, m.status
+  const [metas] = await cliente.query(
+    `SELECT m.codigo, ROUND(m.progresso, 2) AS progresso, m.status
      FROM vw_meta_status m JOIN periodo p ON p.id = m.periodo_id
-     WHERE m.empresa_id = $1 AND p.data_inicio = $2 ORDER BY m.codigo`,
+     WHERE m.empresa_id = ? AND p.data_inicio = ? ORDER BY m.codigo`,
     [empresaId, atual.inicio],
   );
-  const scores = await cliente.query(
-    `SELECT p.trimestre || 'º tri ' || p.ano AS nome,
-            string_agg(s.pilar || '=' || s.score, ' ' ORDER BY s.pilar) AS pilares
+  const [scores] = await cliente.query(
+    `SELECT CONCAT(p.trimestre, 'º tri ', p.ano) AS nome,
+            GROUP_CONCAT(CONCAT(s.pilar, '=', s.score) ORDER BY FIELD(s.pilar, 'E', 'S', 'G') SEPARATOR ' ') AS pilares
      FROM vw_score_pilar s JOIN periodo p ON p.id = s.periodo_id
-     WHERE s.empresa_id = $1 GROUP BY p.id ORDER BY p.data_inicio`,
+     WHERE s.empresa_id = ? GROUP BY p.id, p.trimestre, p.ano, p.data_inicio ORDER BY p.data_inicio`,
     [empresaId],
   );
 
   console.log(`Demo criada: Padaria Estrela. Hoje ${hoje}, ${Math.round(ritmo * 100)}% do trimestre decorrido.`);
-  console.log('Metas do trimestre atual:', metas.rows.map((m) => `${m.codigo} ${m.status}`).join(', '));
-  console.log('Scores por pilar:', scores.rows.map((s) => `${s.nome}: ${s.pilares}`).join(' | '));
+  console.log('Metas do trimestre atual:', metas.map((m) => `${m.codigo} ${m.status}`).join(', '));
+  console.log('Scores por pilar:', scores.map((s) => `${s.nome}: ${s.pilares}`).join(' | '));
   console.log(`Login: ${EMAIL_DEMO} / demo1234`);
 } catch (erro) {
-  await cliente.query('ROLLBACK');
+  await cliente.rollback();
   console.error('Erro ao criar a demo:', erro.message);
   process.exitCode = 1;
 } finally {

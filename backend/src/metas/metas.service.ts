@@ -1,4 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { BancoService } from '../banco/banco.service';
 import { IndicadoresService } from '../indicadores/indicadores.service';
 import { PeriodosService } from '../periodos/periodos.service';
@@ -16,11 +17,9 @@ export class MetasService {
   listar(empresaId: string, periodoId: string) {
     return this.banco.consultar(
       `SELECT meta_id AS id, indicador_id, codigo, indicador, pilar, unidade, direcao,
-              valor_base::float AS valor_base, valor_alvo::float AS valor_alvo,
-              valor_atual::float AS valor_atual, lancamentos::int AS lancamentos,
-              ritmo_esperado::float AS ritmo_esperado, progresso::float AS progresso, status
+              valor_base, valor_alvo, valor_atual, lancamentos, ritmo_esperado, progresso, status
        FROM vw_meta_status
-       WHERE empresa_id = $1 AND periodo_id = $2
+       WHERE empresa_id = ? AND periodo_id = ?
        ORDER BY pilar, codigo`,
       [empresaId, periodoId],
     );
@@ -39,15 +38,16 @@ export class MetasService {
 
     const periodo = await this.periodos.buscar(empresaId, dados.periodoId);
     try {
-      const [meta] = await this.banco.consultar(
-        `INSERT INTO meta_esg (empresa_id, periodo_id, indicador_id, valor_base, valor_alvo)
-         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-        [empresaId, periodo.id, dados.indicadorId, dados.valorBase, dados.valorAlvo],
+      const id = randomUUID();
+      await this.banco.executar(
+        `INSERT INTO meta_esg (id, empresa_id, periodo_id, indicador_id, valor_base, valor_alvo)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, empresaId, periodo.id, dados.indicadorId, dados.valorBase, dados.valorAlvo],
       );
-      return meta;
+      return { id };
     } catch (erro: any) {
-      // 23505 = violou a regra uq_meta (uma meta por indicador por período).
-      if (erro.code === '23505') {
+      // 1062 (ER_DUP_ENTRY) = violou a regra uq_meta (uma meta por indicador por período).
+      if (erro.errno === 1062) {
         throw new ConflictException('Já existe uma meta para este indicador neste trimestre.');
       }
       throw erro;
@@ -55,11 +55,8 @@ export class MetasService {
   }
 
   async excluir(empresaId: string, id: string) {
-    const [meta] = await this.banco.consultar(
-      'DELETE FROM meta_esg WHERE id = $1 AND empresa_id = $2 RETURNING id',
-      [id, empresaId],
-    );
-    if (!meta) throw new NotFoundException('Meta não encontrada.');
-    return meta;
+    const excluidas = await this.banco.executar('DELETE FROM meta_esg WHERE id = ? AND empresa_id = ?', [id, empresaId]);
+    if (!excluidas) throw new NotFoundException('Meta não encontrada.');
+    return { id };
   }
 }

@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { randomUUID } from 'node:crypto';
 import { BancoService } from '../banco/banco.service';
 import { hojeEmSaoPaulo, PeriodosService } from '../periodos/periodos.service';
 import { CadastroDto } from './dto/cadastro.dto';
@@ -21,30 +22,33 @@ export class AuthService {
     }
     const email = dados.email.trim().toLowerCase();
 
-    const [emailUsado] = await this.banco.consultar('SELECT 1 FROM usuario WHERE email = $1', [email]);
+    const [emailUsado] = await this.banco.consultar('SELECT 1 FROM usuario WHERE email = ?', [email]);
     if (emailUsado) throw new ConflictException('Este e-mail já está cadastrado.');
-    const [cnpjUsado] = await this.banco.consultar('SELECT 1 FROM empresa WHERE cnpj = $1', [cnpj]);
+    const [cnpjUsado] = await this.banco.consultar('SELECT 1 FROM empresa WHERE cnpj = ?', [cnpj]);
     if (cnpjUsado) throw new ConflictException('Já existe uma empresa cadastrada com este CNPJ.');
 
     const senhaHash = await bcrypt.hash(dados.senha, 10);
-    // Um único comando cria empresa e usuário: ou os dois são gravados, ou nenhum.
-    const [usuario] = await this.banco.consultar(
-      `WITH nova_empresa AS (
-         INSERT INTO empresa (nome, cnpj, setor, porte) VALUES ($1, $2, $3, $4) RETURNING id
-       )
-       INSERT INTO usuario (empresa_id, nome, email, senha_hash)
-       SELECT id, $5, $6, $7 FROM nova_empresa
-       RETURNING id, empresa_id`,
-      [dados.nomeEmpresa.trim(), cnpj, dados.setor || null, dados.porte || null, dados.nome.trim(), email, senhaHash],
-    );
+    const empresaId = randomUUID();
+    const usuarioId = randomUUID();
+    // Empresa e usuário na mesma transação: ou os dois são gravados, ou nenhum.
+    await this.banco.transacao([
+      [
+        'INSERT INTO empresa (id, nome, cnpj, setor, porte) VALUES (?, ?, ?, ?, ?)',
+        [empresaId, dados.nomeEmpresa.trim(), cnpj, dados.setor || null, dados.porte || null],
+      ],
+      [
+        'INSERT INTO usuario (id, empresa_id, nome, email, senha_hash) VALUES (?, ?, ?, ?, ?)',
+        [usuarioId, empresaId, dados.nome.trim(), email, senhaHash],
+      ],
+    ]);
 
-    await this.periodos.trimestreDaData(usuario.empresa_id, hojeEmSaoPaulo());
-    return this.criarSessao(usuario.id);
+    await this.periodos.trimestreDaData(empresaId, hojeEmSaoPaulo());
+    return this.criarSessao(usuarioId);
   }
 
   async entrar(dados: LoginDto) {
     const [usuario] = await this.banco.consultar(
-      'SELECT id, senha_hash FROM usuario WHERE email = $1',
+      'SELECT id, senha_hash FROM usuario WHERE email = ?',
       [dados.email.trim().toLowerCase()],
     );
     const senhaCorreta = usuario && (await bcrypt.compare(dados.senha, usuario.senha_hash));
@@ -60,7 +64,7 @@ export class AuthService {
               e.id AS empresa_id, e.nome AS empresa, e.cnpj
        FROM usuario u
        JOIN empresa e ON e.id = u.empresa_id
-       WHERE u.id = $1`,
+       WHERE u.id = ?`,
       [usuarioId],
     );
     if (!perfil) throw new UnauthorizedException('Usuário não encontrado. Faça login novamente.');

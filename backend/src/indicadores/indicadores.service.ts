@@ -23,7 +23,7 @@ export class IndicadoresService {
 
   // Indicador que o usuário pode digitar. Os calculados (emissões) são gerados pelo sistema.
   async buscarDigitavel(indicadorId: number): Promise<Indicador> {
-    const [indicador] = await this.banco.consultar<Indicador>('SELECT * FROM indicador WHERE id = $1', [
+    const [indicador] = await this.banco.consultar<Indicador>('SELECT * FROM indicador WHERE id = ?', [
       indicadorId,
     ]);
     if (!indicador) throw new BadRequestException('Indicador não encontrado.');
@@ -33,10 +33,17 @@ export class IndicadoresService {
     return indicador;
   }
 
-  // tCO₂e = kWh / 1000 × fator do SIN vigente na data (função do banco).
+  // tCO₂e = kWh / 1000 × fator do SIN vigente na data.
+  // Mesma regra de fator da view vw_emissoes (ver db/schema.sql).
   async previaEmissao(kwh: number, data: string) {
     const [previa] = await this.banco.consultar(
-      'SELECT ROUND($1::numeric / 1000 * fator_vigente($2::date), 4)::float AS tco2e',
+      `SELECT ROUND(? / 1000 * (
+                SELECT f.valor FROM fator_emissao f
+                ORDER BY (f.ano * 100 + COALESCE(f.mes, 12) <= YEAR(x.d) * 100 + MONTH(x.d)) DESC,
+                         f.ano DESC, COALESCE(f.mes, 0) DESC
+                LIMIT 1
+              ), 4) AS tco2e
+       FROM (SELECT CAST(? AS DATE) AS d) AS x`,
       [kwh, data],
     );
     return previa;

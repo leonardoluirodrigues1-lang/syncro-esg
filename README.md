@@ -12,15 +12,15 @@ políticas...), define metas por trimestre e acompanha:
 - **Relatório** do trimestre, comparado com o anterior, que pode ser salvo em PDF.
 
 Os cálculos (score, status das metas, valor de cada indicador e emissões) são feitos por
-**views do PostgreSQL** em `backend/db/schema.sql`. O backend só consulta essas views.
+**views do MySQL** em `backend/db/schema.sql`. O backend só consulta essas views.
 
 ## Tecnologias
 
 | Parte    | Tecnologias |
 |----------|-------------|
-| Backend  | NestJS + TypeScript, `pg` (SQL direto, sem ORM), JWT (`@nestjs/jwt`), `bcryptjs`, `class-validator` |
+| Backend  | NestJS + TypeScript, `mysql2` (SQL direto, sem ORM), JWT (`@nestjs/jwt`), `bcryptjs`, `class-validator` |
 | Frontend | React + Vite + TypeScript, `react-router-dom`, `recharts`, CSS próprio |
-| Banco    | PostgreSQL (Neon em produção) |
+| Banco    | MySQL 8 (TiDB Cloud em produção) |
 | Deploy   | Vercel (dois projetos: backend e frontend) |
 
 ## Estrutura
@@ -33,7 +33,7 @@ syncro-esg/
     scripts/seed-demo.mjs   cria a empresa de demonstração
     src/
       main.ts               inicia a API (CORS e validação)
-      banco/                pool de conexões com o PostgreSQL
+      banco/                pool de conexões com o MySQL
       auth/                 cadastro, login, perfil e o guard que exige o token
       periodos/             trimestres da empresa
       indicadores/          catálogo e prévia de emissões
@@ -52,7 +52,15 @@ syncro-esg/
 
 ## Rodar localmente
 
-Pré-requisitos: **Node.js 22 ou mais novo** e um **PostgreSQL 14+** (local ou um banco no Neon).
+Pré-requisitos: **Node.js 22 ou mais novo** e um **MySQL 8** (local ou um banco no TiDB Cloud).
+
+No MySQL local, crie o banco e um usuário (troque a senha):
+
+```sql
+CREATE DATABASE syncro;
+CREATE USER 'syncro'@'localhost' IDENTIFIED BY 'syncro';
+GRANT ALL ON syncro.* TO 'syncro'@'localhost';
+```
 
 ### 1. Backend
 
@@ -106,7 +114,7 @@ Dois cuidados:
 
 | Variável       | Exemplo | Para quê |
 |----------------|---------|----------|
-| `DATABASE_URL` | `postgres://usuario:senha@host/banco?sslmode=require` | conexão com o PostgreSQL |
+| `DATABASE_URL` | `mysql://syncro:syncro@localhost:3306/syncro` | conexão com o MySQL (fora do `localhost` a conexão usa SSL) |
 | `JWT_SECRET`   | um texto longo e aleatório | assinar os tokens de login |
 | `FRONTEND_URL` | `https://syncro-esg.vercel.app` | endereço do site liberado no CORS |
 
@@ -137,19 +145,22 @@ Sem `periodoId`, vale o trimestre atual (fuso de São Paulo).
 | GET    | `/painel?periodoId=` | tudo do painel em uma chamada |
 | GET    | `/relatorio?periodoId=` | dados do relatório (atual × anterior) |
 
-## Deploy (Neon + GitHub + Vercel)
+## Deploy (TiDB Cloud + GitHub + Vercel)
 
 O backend usa **NestJS 11**, a versão suportada pela Vercel sem configuração
 (o arquivo de entrada é `backend/src/main.ts`).
 
-### a) Banco no Neon
+### a) Banco no TiDB Cloud (compatível com MySQL)
 
-1. Crie uma conta em [neon.tech](https://neon.tech) e um **projeto** (plano gratuito;
-   escolha a região mais próxima, ex.: São Paulo, se houver).
-2. No painel do projeto, clique em **Connect** e copie a **connection string**.
-   Ela tem o formato `postgresql://usuario:senha@host.neon.tech/neondb?sslmode=require`.
-3. No seu computador, abra `backend/.env` e coloque essa string em `DATABASE_URL`.
-4. Dentro de `backend/`, rode:
+1. Crie uma conta em [tidbcloud.com](https://tidbcloud.com) e um cluster **Starter**
+   (gratuito; escolha a região mais próxima).
+2. No cluster, clique em **Connect**, gere a senha e escolha o banco `test`
+   (ou crie um, ex.: `CREATE DATABASE syncro;` no **SQL Editor**).
+3. Monte a `DATABASE_URL` com os dados mostrados:
+   `mysql://USUARIO:SENHA@HOST:4000/syncro` (ex.: host `gateway01.sa-east-1.prod.aws.tidbcloud.com`,
+   usuário no formato `xxxx.root`). O SSL é ligado automaticamente porque o host não é `localhost`.
+4. No seu computador, abra `backend/.env` e coloque essa string em `DATABASE_URL`.
+5. Dentro de `backend/`, rode:
    ```bash
    npm run db:setup   # cria tabelas, catálogo e views
    npm run db:seed    # cria a Padaria Estrela (demo)
@@ -181,7 +192,7 @@ Em cada projeto da Vercel: **Settings → Environment Variables**.
 
 | Projeto  | Variável       | Valor |
 |----------|----------------|-------|
-| backend  | `DATABASE_URL` | a connection string do Neon |
+| backend  | `DATABASE_URL` | a string `mysql://...` do TiDB Cloud |
 | backend  | `JWT_SECRET`   | um texto longo e aleatório (ex.: gerado com `node -e "console.log(crypto.randomUUID()+crypto.randomUUID())"`) |
 | backend  | `FRONTEND_URL` | o endereço do frontend publicado, ex.: `https://syncro-esg.vercel.app` (sem `/` no final) |
 | frontend | `VITE_API_URL` | o endereço do backend publicado, ex.: `https://syncro-esg-api.vercel.app` (sem `/` no final) |

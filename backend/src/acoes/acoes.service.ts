@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import type { UsuarioToken } from '../auth/usuario-logado.decorator';
 import { BancoService } from '../banco/banco.service';
 import { IndicadoresService } from '../indicadores/indicadores.service';
@@ -16,11 +17,11 @@ export class AcoesService {
   listar(empresaId: string, periodoId: string) {
     return this.banco.consultar(
       `SELECT a.id, a.indicador_id, i.codigo, i.nome AS indicador, i.pilar, i.unidade,
-              a.valor::float AS valor, a.data_referencia, a.descricao, e.tco2e::float AS tco2e
+              a.valor, a.data_referencia, a.descricao, e.tco2e
        FROM acao_esg a
        JOIN indicador i ON i.id = a.indicador_id
        LEFT JOIN vw_emissoes e ON e.acao_id = a.id
-       WHERE a.empresa_id = $1 AND a.periodo_id = $2
+       WHERE a.empresa_id = ? AND a.periodo_id = ?
        ORDER BY a.data_referencia DESC, a.criado_em DESC`,
       [empresaId, periodoId],
     );
@@ -30,11 +31,12 @@ export class AcoesService {
     await this.indicadores.buscarDigitavel(dados.indicadorId);
     const periodo = await this.periodos.trimestreDaData(usuario.empresaId, dados.dataReferencia);
 
-    const [acao] = await this.banco.consultar(
-      `INSERT INTO acao_esg (empresa_id, periodo_id, usuario_id, indicador_id, valor, data_referencia, descricao)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, periodo_id`,
+    const id = randomUUID();
+    await this.banco.executar(
+      `INSERT INTO acao_esg (id, empresa_id, periodo_id, usuario_id, indicador_id, valor, data_referencia, descricao)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        id,
         usuario.empresaId,
         periodo.id,
         usuario.usuarioId,
@@ -44,7 +46,7 @@ export class AcoesService {
         dados.descricao || null,
       ],
     );
-    return acao;
+    return { id, periodo_id: periodo.id };
   }
 
   async atualizar(empresaId: string, id: string, dados: AcaoDto) {
@@ -52,23 +54,19 @@ export class AcoesService {
     // Se a data mudou de trimestre, o lançamento muda de período junto.
     const periodo = await this.periodos.trimestreDaData(empresaId, dados.dataReferencia);
 
-    const [acao] = await this.banco.consultar(
+    const alteradas = await this.banco.executar(
       `UPDATE acao_esg
-       SET periodo_id = $3, indicador_id = $4, valor = $5, data_referencia = $6, descricao = $7
-       WHERE id = $1 AND empresa_id = $2
-       RETURNING id, periodo_id`,
-      [id, empresaId, periodo.id, dados.indicadorId, dados.valor, dados.dataReferencia, dados.descricao || null],
+       SET periodo_id = ?, indicador_id = ?, valor = ?, data_referencia = ?, descricao = ?
+       WHERE id = ? AND empresa_id = ?`,
+      [periodo.id, dados.indicadorId, dados.valor, dados.dataReferencia, dados.descricao || null, id, empresaId],
     );
-    if (!acao) throw new NotFoundException('Lançamento não encontrado.');
-    return acao;
+    if (!alteradas) throw new NotFoundException('Lançamento não encontrado.');
+    return { id, periodo_id: periodo.id };
   }
 
   async excluir(empresaId: string, id: string) {
-    const [acao] = await this.banco.consultar(
-      'DELETE FROM acao_esg WHERE id = $1 AND empresa_id = $2 RETURNING id',
-      [id, empresaId],
-    );
-    if (!acao) throw new NotFoundException('Lançamento não encontrado.');
-    return acao;
+    const excluidas = await this.banco.executar('DELETE FROM acao_esg WHERE id = ? AND empresa_id = ?', [id, empresaId]);
+    if (!excluidas) throw new NotFoundException('Lançamento não encontrado.');
+    return { id };
   }
 }

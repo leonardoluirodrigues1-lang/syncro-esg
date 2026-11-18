@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { BancoService } from '../banco/banco.service';
 
 interface Periodo {
@@ -11,7 +12,7 @@ interface Periodo {
 }
 
 const COLUNAS = `p.id, p.ano, p.trimestre, p.data_inicio, p.data_fim,
-                 p.trimestre || 'º tri ' || p.ano AS nome`;
+                 CONCAT(p.trimestre, 'º tri ', p.ano) AS nome`;
 
 // Data de hoje no fuso de São Paulo (AAAA-MM-DD), independente do fuso do servidor.
 export function hojeEmSaoPaulo(): string {
@@ -24,25 +25,26 @@ export class PeriodosService {
 
   listar(empresaId: string): Promise<Periodo[]> {
     return this.banco.consultar(
-      `SELECT ${COLUNAS} FROM periodo p WHERE p.empresa_id = $1 ORDER BY p.data_inicio DESC`,
+      `SELECT ${COLUNAS} FROM periodo p WHERE p.empresa_id = ? ORDER BY p.data_inicio DESC`,
       [empresaId],
     );
   }
 
   // Devolve o trimestre que contém a data; cria o trimestre se ainda não existir.
   async trimestreDaData(empresaId: string, data: string): Promise<Periodo> {
-    await this.banco.consultar(
-      `INSERT INTO periodo (empresa_id, tipo, ano, trimestre, data_inicio, data_fim)
-       SELECT $1, 'trimestre', EXTRACT(YEAR FROM d), EXTRACT(QUARTER FROM d),
-              date_trunc('quarter', d)::date,
-              (date_trunc('quarter', d) + INTERVAL '3 months - 1 day')::date
-       FROM (SELECT $2::date AS d) AS x
-       ON CONFLICT (empresa_id, tipo, ano, trimestre) DO NOTHING`,
-      [empresaId, data],
+    // Se o trimestre já existe (regra uq_periodo), o ON DUPLICATE KEY não altera nada.
+    await this.banco.executar(
+      `INSERT INTO periodo (id, empresa_id, tipo, ano, trimestre, data_inicio, data_fim)
+       SELECT ?, ?, 'trimestre', YEAR(d), QUARTER(d),
+              MAKEDATE(YEAR(d), 1) + INTERVAL (QUARTER(d) - 1) QUARTER,
+              MAKEDATE(YEAR(d), 1) + INTERVAL QUARTER(d) QUARTER - INTERVAL 1 DAY
+       FROM (SELECT CAST(? AS DATE) AS d) AS x
+       ON DUPLICATE KEY UPDATE id = id`,
+      [randomUUID(), empresaId, data],
     );
     const [periodo] = await this.banco.consultar<Periodo>(
       `SELECT ${COLUNAS} FROM periodo p
-       WHERE p.empresa_id = $1 AND p.tipo = 'trimestre' AND $2::date BETWEEN p.data_inicio AND p.data_fim`,
+       WHERE p.empresa_id = ? AND p.tipo = 'trimestre' AND CAST(? AS DATE) BETWEEN p.data_inicio AND p.data_fim`,
       [empresaId, data],
     );
     return periodo;
@@ -53,7 +55,7 @@ export class PeriodosService {
     if (!periodoId) return this.trimestreDaData(empresaId, hojeEmSaoPaulo());
 
     const [periodo] = await this.banco.consultar<Periodo>(
-      `SELECT ${COLUNAS} FROM periodo p WHERE p.id = $1 AND p.empresa_id = $2`,
+      `SELECT ${COLUNAS} FROM periodo p WHERE p.id = ? AND p.empresa_id = ?`,
       [periodoId, empresaId],
     );
     if (!periodo) throw new NotFoundException('Período não encontrado.');
@@ -63,7 +65,7 @@ export class PeriodosService {
   async anterior(empresaId: string, periodo: Periodo): Promise<Periodo | null> {
     const [anterior] = await this.banco.consultar<Periodo>(
       `SELECT ${COLUNAS} FROM periodo p
-       WHERE p.empresa_id = $1 AND p.data_fim < $2
+       WHERE p.empresa_id = ? AND p.data_fim < ?
        ORDER BY p.data_inicio DESC LIMIT 1`,
       [empresaId, periodo.data_inicio],
     );

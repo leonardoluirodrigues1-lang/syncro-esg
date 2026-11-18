@@ -18,7 +18,7 @@ export class RelatorioService {
     const periodoAnterior = await this.periodos.anterior(empresaId, periodo);
 
     const [empresas, historico, metas, indicadores] = await Promise.all([
-      this.banco.consultar('SELECT nome, cnpj, setor, porte FROM empresa WHERE id = $1', [empresaId]),
+      this.banco.consultar('SELECT nome, cnpj, setor, porte FROM empresa WHERE id = ?', [empresaId]),
       this.painel.scoresPorPeriodo(empresaId),
       this.metas.listar(empresaId, periodo.id),
       this.tabelaDeIndicadores(periodo.id, periodoAnterior?.id ?? null),
@@ -40,18 +40,19 @@ export class RelatorioService {
     return this.banco.consultar(
       `SELECT i.codigo, i.nome, i.pilar, i.unidade, i.direcao,
               CASE WHEN i.calculado
-                   THEN (SELECT SUM(e.tco2e) FROM vw_emissoes e WHERE e.periodo_id = $1)
-                   ELSE atual.valor END::float AS atual,
+                   THEN (SELECT SUM(e.tco2e) FROM vw_emissoes e WHERE e.periodo_id = ?)
+                   ELSE atual.valor END AS atual,
               CASE WHEN i.calculado
-                   THEN (SELECT SUM(e.tco2e) FROM vw_emissoes e WHERE e.periodo_id = $2)
-                   ELSE anterior.valor END::float AS anterior
+                   THEN (SELECT SUM(e.tco2e) FROM vw_emissoes e WHERE e.periodo_id = ?)
+                   ELSE anterior.valor END AS anterior
        FROM indicador i
        LEFT JOIN vw_indicador_periodo atual
-              ON atual.indicador_id = i.id AND atual.periodo_id = $1
+              ON atual.indicador_id = i.id AND atual.periodo_id = ?
        LEFT JOIN vw_indicador_periodo anterior
-              ON anterior.indicador_id = i.id AND anterior.periodo_id = $2::uuid
+              ON anterior.indicador_id = i.id AND anterior.periodo_id = ?
        ORDER BY i.pilar, i.codigo`,
-      [periodoId, periodoAnteriorId],
+      // Cada ? recebe um valor, na ordem em que aparece no SQL.
+      [periodoId, periodoAnteriorId, periodoId, periodoAnteriorId],
     );
   }
 }
