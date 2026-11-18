@@ -100,7 +100,7 @@ No final, o seed imprime os status e scores lidos das views, para conferência.
 
 Dois cuidados:
 
-- **Rode o seed perto da apresentação** (no dia ou na véspera). Os status são calculados com a
+- **Rode `npm run db:seed` no dia anterior à apresentação.** Os status são calculados com a
   data do dia em que o seed rodou; com o passar dos dias o ritmo esperado aumenta e,
   depois de cerca de 10 dias, a meta "Atenção" passa a "Em risco".
 - **Nos primeiros ~23 dias de um trimestre não dá para ter "Em risco"**: esse status exige estar
