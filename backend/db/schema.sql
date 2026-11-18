@@ -248,6 +248,8 @@ LEFT JOIN (
   GROUP BY p.id, i.pilar
 ) AS c ON c.periodo_id = pl.periodo_id AND c.pilar = pl.pilar
 LEFT JOIN (
-  SELECT periodo_id, pilar, AVG(progresso) AS media_progresso, COUNT(*) AS metas
+  -- SUM / COUNT em vez de AVG por compatibilidade com o TiDB: ele falha no AVG
+  -- de um numero com 30 casas decimais (o progresso). A conta e a mesma.
+  SELECT periodo_id, pilar, SUM(progresso) / COUNT(progresso) AS media_progresso, COUNT(*) AS metas
   FROM vw_meta_status GROUP BY periodo_id, pilar
 ) AS m ON m.periodo_id = pl.periodo_id AND m.pilar = pl.pilar;

@@ -31,16 +31,23 @@ export class PeriodosService {
   }
 
   // Devolve o trimestre que contém a data; cria o trimestre se ainda não existir.
+  // A data já vem como 'AAAA-MM-DD' no fuso de São Paulo (hojeEmSaoPaulo ou o formulário).
   async trimestreDaData(empresaId: string, data: string): Promise<Periodo> {
+    // Início e fim do trimestre calculados aqui, sem INTERVAL no SQL (compatível com o TiDB).
+    const [ano, mes] = data.split('-').map(Number);
+    const trimestre = Math.floor((mes - 1) / 3) + 1;
+    const primeiroMes = (trimestre - 1) * 3 + 1;
+    const ultimoDia = new Date(Date.UTC(ano, primeiroMes + 2, 0)).getUTCDate(); // dia 0 = último dia do mês anterior
+    const doisDigitos = (n: number) => String(n).padStart(2, '0');
+    const inicio = `${ano}-${doisDigitos(primeiroMes)}-01`;
+    const fim = `${ano}-${doisDigitos(primeiroMes + 2)}-${ultimoDia}`;
+
     // Se o trimestre já existe (regra uq_periodo), o ON DUPLICATE KEY não altera nada.
     await this.banco.executar(
       `INSERT INTO periodo (id, empresa_id, tipo, ano, trimestre, data_inicio, data_fim)
-       SELECT ?, ?, 'trimestre', YEAR(d), QUARTER(d),
-              MAKEDATE(YEAR(d), 1) + INTERVAL (QUARTER(d) - 1) QUARTER,
-              MAKEDATE(YEAR(d), 1) + INTERVAL QUARTER(d) QUARTER - INTERVAL 1 DAY
-       FROM (SELECT CAST(? AS DATE) AS d) AS x
+       VALUES (?, ?, 'trimestre', ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE id = id`,
-      [randomUUID(), empresaId, data],
+      [randomUUID(), empresaId, ano, trimestre, inicio, fim],
     );
     const [periodo] = await this.banco.consultar<Periodo>(
       `SELECT ${COLUNAS} FROM periodo p
