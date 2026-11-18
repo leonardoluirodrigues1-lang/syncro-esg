@@ -142,6 +142,7 @@ export default function Acoes() {
             {indicador.agregacao === 'soma'
               ? 'os lançamentos do trimestre são somados'
               : 'o trimestre usa a média dos lançamentos'}
+            <small className="referencia">Referência: {indicador.referencia}</small>
           </p>
         )}
 
@@ -151,6 +152,7 @@ export default function Acoes() {
             <input
               type="number"
               min="0"
+              max={indicador?.unidade === '%' ? 100 : undefined} // percentuais vão até 100
               step="any"
               value={formulario.valor}
               onChange={(e) => alterar('valor', e.target.value)}
@@ -165,7 +167,8 @@ export default function Acoes() {
 
         {previa !== null && (
           <p className="previa-emissao">
-            Emissão estimada: <strong>{formatarNumero(previa, 4)} tCO₂e</strong> (fator médio do SIN)
+            Emissão estimada: <strong>{formatarNumero(previa, 4)} tCO₂e</strong> (GHG Protocol – escopo 2, fator
+            médio do SIN/MCTI)
           </p>
         )}
 
@@ -214,6 +217,7 @@ export default function Acoes() {
                     <td>
                       <span className="ponto-pilar" style={{ background: PILARES[a.pilar].cor }} />
                       {a.indicador}
+                      <small className="referencia">{a.referencia}</small>
                     </td>
                     <td className="numero">
                       {formatarNumero(a.valor)} {a.unidade}

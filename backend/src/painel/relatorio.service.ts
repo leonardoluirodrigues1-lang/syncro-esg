@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BancoService } from '../banco/banco.service';
+import { comReferencia } from '../indicadores/referencias';
 import { MetasService } from '../metas/metas.service';
 import { PeriodosService } from '../periodos/periodos.service';
 import { PainelService } from './painel.service';
@@ -36,8 +37,8 @@ export class RelatorioService {
 
   // Valor de cada indicador no período atual e no anterior.
   // As emissões (indicador calculado) vêm da vw_emissoes e entram como mais uma linha.
-  private tabelaDeIndicadores(periodoId: string, periodoAnteriorId: string | null) {
-    return this.banco.consultar(
+  private async tabelaDeIndicadores(periodoId: string, periodoAnteriorId: string | null) {
+    const linhas = await this.banco.consultar<{ codigo: string }>(
       `SELECT i.codigo, i.nome, i.pilar, i.unidade, i.direcao,
               CASE WHEN i.calculado
                    THEN (SELECT SUM(e.tco2e) FROM vw_emissoes e WHERE e.periodo_id = ?)
@@ -54,5 +55,6 @@ export class RelatorioService {
       // Cada ? recebe um valor, na ordem em que aparece no SQL.
       [periodoId, periodoAnteriorId, periodoId, periodoAnteriorId],
     );
+    return comReferencia(linhas);
   }
 }

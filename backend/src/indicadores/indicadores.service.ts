@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BancoService } from '../banco/banco.service';
+import { comReferencia } from './referencias';
 
 interface Indicador {
   id: number;
@@ -17,8 +18,17 @@ interface Indicador {
 export class IndicadoresService {
   constructor(private banco: BancoService) {}
 
-  listar(): Promise<Indicador[]> {
-    return this.banco.consultar('SELECT * FROM indicador ORDER BY pilar, codigo');
+  async listar() {
+    const indicadores = await this.banco.consultar<Indicador>('SELECT * FROM indicador ORDER BY pilar, codigo');
+    return comReferencia(indicadores);
+  }
+
+  // Indicadores em % não podem passar de 100 (vale para lançamentos e metas).
+  // Fica aqui, e não no DTO, porque a unidade só é conhecida depois de buscar o indicador no banco.
+  validarPercentual(indicador: Indicador, ...valores: number[]) {
+    if (indicador.unidade === '%' && valores.some((v) => v > 100)) {
+      throw new BadRequestException('Este indicador é um percentual: o valor deve ficar entre 0 e 100.');
+    }
   }
 
   // Indicador que o usuário pode digitar. Os calculados (emissões) são gerados pelo sistema.

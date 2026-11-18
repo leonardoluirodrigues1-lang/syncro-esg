@@ -109,6 +109,7 @@ export default function Metas() {
             Valor base
             <input
               type="number"
+              max={indicador?.unidade === '%' ? 100 : undefined} // percentuais vão até 100
               step="any"
               value={formulario.valorBase}
               onChange={(e) => alterar('valorBase', e.target.value)}
@@ -119,6 +120,7 @@ export default function Metas() {
             Valor alvo
             <input
               type="number"
+              max={indicador?.unidade === '%' ? 100 : undefined} // percentuais vão até 100
               step="any"
               value={formulario.valorAlvo}
               onChange={(e) => alterar('valorAlvo', e.target.value)}

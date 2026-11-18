@@ -75,6 +75,9 @@ npm run start:dev         # API em http://localhost:3000
 
 Para apagar tudo e recriar o banco: `npm run db:reset` e depois `npm run db:seed`.
 
+Para atualizar um banco que já existe (novos fatores de emissão do MCTI e versão atual das views),
+sem apagar nada: `npm run db:atualizar`. Pode rodar mais de uma vez.
+
 ### 2. Frontend
 
 ```bash

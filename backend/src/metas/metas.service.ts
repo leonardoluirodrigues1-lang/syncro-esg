@@ -27,6 +27,7 @@ export class MetasService {
 
   async criar(empresaId: string, dados: MetaDto) {
     const indicador = await this.indicadores.buscarDigitavel(dados.indicadorId);
+    this.indicadores.validarPercentual(indicador, dados.valorBase, dados.valorAlvo);
 
     // A meta precisa apontar na direção em que o indicador melhora.
     if (indicador.direcao === 'reduzir' && dados.valorAlvo >= dados.valorBase) {

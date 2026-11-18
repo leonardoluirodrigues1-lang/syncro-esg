@@ -7,6 +7,8 @@ import SeloStatus from '../components/SeloStatus';
 import { formatarData, formatarNumero, formatarPercentual, PILARES } from '../formatos';
 import type { DadosPainel } from '../tipos';
 
+const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+
 export default function Painel() {
   const [periodoId, setPeriodoId] = useState(''); // vazio = trimestre atual
   const [dados, setDados] = useState<DadosPainel | null>(null);
@@ -40,6 +42,15 @@ export default function Painel() {
           <span className="rotulo">Score ESG geral</span>
           <strong className="score-grande">{scores.geral}</strong>
           <span className="texto-suave">de 100 · {dados.periodo.nome}</span>
+          {/* <details> abre e fecha sem JavaScript e funciona com teclado. */}
+          <details className="como-calculado">
+            <summary>Como é calculado?</summary>
+            <p>
+              Cada pilar = 70% do progresso médio das metas + 30% da cobertura (indicadores obrigatórios com
+              lançamento no trimestre).
+            </p>
+            <p>Geral = 40% Ambiental + 30% Social + 30% Governança.</p>
+          </details>
         </div>
         {pilares.map((p) => (
           <div className="cartao" key={p.nome}>
@@ -80,6 +91,16 @@ export default function Painel() {
             <p className="texto-suave">
               Calculadas a partir de {formatarNumero(dados.emissoes.kwh)} kWh de energia elétrica lançados no trimestre.
             </p>
+            {dados.emissoes.fatores.length > 0 && (
+              <p className="referencia">
+                Fator do SIN usado:{' '}
+                {dados.emissoes.fatores
+                  .map((f) => `${formatarNumero(f.valor, 4)} tCO₂/MWh (${f.mes ? `${MESES[f.mes - 1]}/` : 'anual '}${f.ano})`)
+                  .join('; ')}
+                . Fonte: MCTI/SIRENE.
+              </p>
+            )}
+            <p className="referencia">Metodologia: GHG Protocol – escopo 2 (abordagem por localização).</p>
           </div>
 
           <div className="cartao">

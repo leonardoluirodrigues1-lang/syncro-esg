@@ -19,6 +19,7 @@ export interface Indicador {
   direcao: 'reduzir' | 'aumentar';
   agregacao: 'soma' | 'media';
   calculado: boolean;
+  referencia: string; // ex.: "GRI 302-1 · ODS 7"
 }
 
 export interface Acao {
@@ -30,6 +31,7 @@ export interface Acao {
   valor: number;
   data_referencia: string;
   descricao: string | null;
+  referencia: string;
 }
 
 export interface Meta {
@@ -63,9 +65,17 @@ export interface DadosPainel {
   periodos: Periodo[];
   scores: Scores;
   metas: Meta[];
-  emissoes: { kwh: number; tco2e: number };
+  emissoes: { kwh: number; tco2e: number; fatores: FatorEmissao[] };
   ultimosLancamentos: Acao[];
   historico: Scores[];
+}
+
+// Fator médio do SIN (MCTI) usado no cálculo. mes null = fator anual.
+export interface FatorEmissao {
+  ano: number;
+  mes: number | null;
+  valor: number;
+  fonte: string;
 }
 
 export interface LinhaRelatorio {
@@ -76,6 +86,7 @@ export interface LinhaRelatorio {
   direcao: 'reduzir' | 'aumentar';
   atual: number | null;
   anterior: number | null;
+  referencia: string;
 }
 
 export interface DadosRelatorio {

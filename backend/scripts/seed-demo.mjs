@@ -99,8 +99,10 @@ await cliente.query('SET SESSION div_precision_increment = 30');
 try {
   await cliente.beginTransaction();
 
-  // Usa a mesma data que as views usam (CURRENT_DATE do banco).
-  const [[{ hoje }]] = await cliente.query('SELECT CURRENT_DATE AS hoje');
+  // Usa a mesma data que a view vw_meta_status usa (hoje em São Paulo, UTC-3).
+  const [[{ hoje }]] = await cliente.query(
+    "SELECT DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '-03:00')) AS hoje",
+  );
 
   // acao_esg -> periodo é RESTRICT, então os lançamentos saem antes da empresa.
   await cliente.query(

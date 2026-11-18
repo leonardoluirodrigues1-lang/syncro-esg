@@ -111,6 +111,7 @@ export default function Relatorio() {
                     <td>
                       <span className="ponto-pilar" style={{ background: PILARES[linha.pilar].cor }} />
                       {linha.nome}
+                      <small className="referencia">{linha.referencia}</small>
                     </td>
                     <td className="numero">{valorOuTraco(linha.atual, linha.unidade)}</td>
                     <td className="numero">{valorOuTraco(linha.anterior, linha.unidade)}</td>
@@ -159,8 +160,9 @@ export default function Relatorio() {
         )}
 
         <p className="texto-suave relatorio-rodape">
-          Emitido em {new Date().toLocaleDateString('pt-BR')} pelo Syncro ESG. Emissões de escopo 2 calculadas com o
-          fator médio do SIN (MCTI).
+          Emitido em {new Date().toLocaleDateString('pt-BR')} pelo Syncro ESG. Emissões calculadas pelo GHG Protocol –
+          escopo 2 (abordagem por localização), com o fator médio do SIN (MCTI). Referências dos indicadores: GRI
+          Standards e Objetivos de Desenvolvimento Sustentável (ODS/ONU).
         </p>
       </article>
     </>

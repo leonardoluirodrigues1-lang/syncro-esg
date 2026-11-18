@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { UsuarioToken } from '../auth/usuario-logado.decorator';
 import { BancoService } from '../banco/banco.service';
 import { IndicadoresService } from '../indicadores/indicadores.service';
+import { comReferencia } from '../indicadores/referencias';
 import { PeriodosService } from '../periodos/periodos.service';
 import { AcaoDto } from './dto/acao.dto';
 
@@ -14,8 +15,8 @@ export class AcoesService {
     private periodos: PeriodosService,
   ) {}
 
-  listar(empresaId: string, periodoId: string) {
-    return this.banco.consultar(
+  async listar(empresaId: string, periodoId: string) {
+    const acoes = await this.banco.consultar<{ codigo: string }>(
       `SELECT a.id, a.indicador_id, i.codigo, i.nome AS indicador, i.pilar, i.unidade,
               a.valor, a.data_referencia, a.descricao, e.tco2e
        FROM acao_esg a
@@ -25,10 +26,12 @@ export class AcoesService {
        ORDER BY a.data_referencia DESC, a.criado_em DESC`,
       [empresaId, periodoId],
     );
+    return comReferencia(acoes);
   }
 
   async criar(usuario: UsuarioToken, dados: AcaoDto) {
-    await this.indicadores.buscarDigitavel(dados.indicadorId);
+    const indicador = await this.indicadores.buscarDigitavel(dados.indicadorId);
+    this.indicadores.validarPercentual(indicador, dados.valor);
     const periodo = await this.periodos.trimestreDaData(usuario.empresaId, dados.dataReferencia);
 
     const id = randomUUID();
@@ -50,7 +53,8 @@ export class AcoesService {
   }
 
   async atualizar(empresaId: string, id: string, dados: AcaoDto) {
-    await this.indicadores.buscarDigitavel(dados.indicadorId);
+    const indicador = await this.indicadores.buscarDigitavel(dados.indicadorId);
+    this.indicadores.validarPercentual(indicador, dados.valor);
     // Se a data mudou de trimestre, o lançamento muda de período junto.
     const periodo = await this.periodos.trimestreDaData(empresaId, dados.dataReferencia);
 

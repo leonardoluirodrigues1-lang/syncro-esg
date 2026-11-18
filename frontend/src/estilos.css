@@ -688,3 +688,22 @@ td {
     padding: 6px 10px;
   }
 }
+
+/* Referência do indicador (GRI, ODS, GHG Protocol) e fator de emissão: letra pequena. */
+.referencia {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+}
+
+/* "Como é calculado?" do score no painel. */
+.como-calculado {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+.como-calculado summary {
+  cursor: pointer;
+}
+.como-calculado p {
+  margin: 0.25rem 0 0;
+}

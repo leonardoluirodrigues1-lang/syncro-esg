@@ -54,7 +54,16 @@ export class PainelService {
        FROM vw_emissoes WHERE empresa_id = ? AND periodo_id = ?`,
       [empresaId, periodoId],
     );
-    return emissoes;
+    // Fatores do SIN usados nos lançamentos do trimestre (pode ser mais de um, um por mês).
+    const fatores = await this.banco.consultar(
+      `SELECT DISTINCT f.ano, f.mes, f.valor, f.fonte
+       FROM vw_emissoes e
+       JOIN fator_emissao f ON f.id = e.fator_id
+       WHERE e.empresa_id = ? AND e.periodo_id = ?
+       ORDER BY f.ano, f.mes`,
+      [empresaId, periodoId],
+    );
+    return { ...emissoes, fatores };
   }
 
   // Tudo o que a tela do painel precisa, em uma chamada só.

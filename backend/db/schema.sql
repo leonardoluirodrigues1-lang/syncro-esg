@@ -138,14 +138,35 @@ INSERT INTO indicador (id, codigo, nome, pilar, unidade, direcao, agregacao, obr
 -- =====================================================================
 -- FATORES MEDIOS DE EMISSAO DO SIN (MCTI / SIRENE), em tCO2/MWh.
 -- Para lancamentos sem fator do proprio mes, usa-se o mais recente.
--- Atualize com os meses mais recentes publicados pelo MCTI.
+-- Fonte: planilha "Inventarios Corporativos" do MCTI/SIRENE
+--   https://www.gov.br/mcti/pt-br/acompanhe-o-mcti/sirene/dados-e-ferramentas/fatores-de-emissao
+--   (arquivo Inventario_2026_janset.xlsx, que traz 2025 completo e 2026 ate setembro).
+-- Para incluir meses novos: acrescente as linhas aqui e rode
+--   npm run db:atualizar   (insere so o que falta, sem apagar nada).
 -- =====================================================================
 INSERT INTO fator_emissao (ano, mes, valor, fonte) VALUES
 (2023, NULL, 0.03850, 'MCTI - fator médio anual SIN 2023'),
 (2025, 1,    0.02370, 'MCTI/SIRENE - fator médio mensal SIN'),
 (2025, 2,    0.02480, 'MCTI/SIRENE - fator médio mensal SIN'),
 (2025, 3,    0.02150, 'MCTI/SIRENE - fator médio mensal SIN'),
-(2025, 4,    0.02890, 'MCTI/SIRENE - fator médio mensal SIN');
+(2025, 4,    0.02890, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 5,    0.03090, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 6,    0.04550, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 7,    0.06030, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 8,    0.06670, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 9,    0.05630, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 10,   0.06800, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 11,   0.07780, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2025, 12,   0.04860, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 1,    0.04580, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 2,    0.04900, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 3,    0.04860, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 4,    0.03310, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 5,    0.03120, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 6,    0.04530, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 7,    0.05170, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 8,    0.04710, 'MCTI/SIRENE - fator médio mensal SIN'),
+(2026, 9,    0.04620, 'MCTI/SIRENE - fator médio mensal SIN');
 
 -- =====================================================================
 -- VIEW: emissoes de escopo 2 por lancamento de energia
@@ -158,20 +179,24 @@ INSERT INTO fator_emissao (ano, mes, valor, fonte) VALUES
 --   data, usa o mais recente disponivel.
 -- A mesma regra esta em IndicadoresService.previaEmissao (backend).
 -- =====================================================================
+-- fator_id: qual fator foi usado (o painel mostra o valor e o mes dele).
 CREATE OR REPLACE VIEW vw_emissoes AS
-SELECT a.empresa_id, a.periodo_id, a.id AS acao_id, a.data_referencia,
-       a.valor AS kwh,
-       ROUND(a.valor / 1000 * (
-           SELECT f.valor FROM fator_emissao f
-           ORDER BY
-             (f.ano * 100 + COALESCE(f.mes, 12)
-                <= YEAR(a.data_referencia) * 100 + MONTH(a.data_referencia)) DESC,
-             f.ano DESC, COALESCE(f.mes, 0) DESC
-           LIMIT 1
-       ), 4) AS tco2e
-FROM acao_esg a
-JOIN indicador i ON i.id = a.indicador_id
-WHERE i.codigo = 'ENE-01';
+SELECT x.empresa_id, x.periodo_id, x.acao_id, x.data_referencia, x.kwh, x.fator_id,
+       ROUND(x.kwh / 1000 * f.valor, 4) AS tco2e
+FROM (
+  SELECT a.empresa_id, a.periodo_id, a.id AS acao_id, a.data_referencia,
+         a.valor AS kwh,
+         (SELECT f.id FROM fator_emissao f
+          ORDER BY
+            (f.ano * 100 + COALESCE(f.mes, 12)
+               <= YEAR(a.data_referencia) * 100 + MONTH(a.data_referencia)) DESC,
+            f.ano DESC, COALESCE(f.mes, 0) DESC
+          LIMIT 1) AS fator_id
+  FROM acao_esg a
+  JOIN indicador i ON i.id = a.indicador_id
+  WHERE i.codigo = 'ENE-01'
+) AS x
+LEFT JOIN fator_emissao f ON f.id = x.fator_id;
 
 -- =====================================================================
 -- VIEW: valor de cada indicador em cada periodo (soma ou media)
@@ -189,6 +214,9 @@ GROUP BY a.empresa_id, a.periodo_id, i.id, i.agregacao;
 --   progresso = (atual - base) / (alvo - base), limitado entre 0 e 1
 --     (o sinal de alvo - base ja carrega a direcao: reduzir ou aumentar)
 --   ritmo_esperado = fracao do periodo ja decorrida
+--     "hoje" e a data de Sao Paulo (o mesmo fuso que define o trimestre).
+--     UTC-3 fixo: o Brasil nao tem horario de verao desde 2019 e assim nao
+--     dependemos das tabelas de fuso do MySQL (o TiDB em producao roda em UTC).
 --   desvio = progresso - ritmo_esperado
 --     >= -0,10 no_prazo | entre -0,25 e -0,10 atencao | < -0,25 em_risco
 -- Os COALESCE(..., 0) dentro do GREATEST repetem o comportamento do
@@ -210,7 +238,7 @@ FROM (
            COALESCE(v.valor, m.valor_base) AS valor_atual,
            COALESCE(v.lancamentos, 0) AS lancamentos,
            LEAST(GREATEST(COALESCE(
-             DATEDIFF(CURRENT_DATE, p.data_inicio)
+             DATEDIFF(DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '-03:00')), p.data_inicio)
                / NULLIF(DATEDIFF(p.data_fim, p.data_inicio), 0), 0), 0), 1) AS ritmo_esperado
     FROM meta_esg m
     JOIN periodo p   ON p.id = m.periodo_id
