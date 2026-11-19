@@ -1,11 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type { UsuarioToken } from '../auth/usuario-logado.decorator';
 import { BancoService } from '../banco/banco.service';
 import { IndicadoresService } from '../indicadores/indicadores.service';
 import { comReferencia } from '../indicadores/referencias';
-import { PeriodosService } from '../periodos/periodos.service';
+import { hojeEmSaoPaulo, PeriodosService } from '../periodos/periodos.service';
 import { AcaoDto } from './dto/acao.dto';
+
+// Não deixa lançar ação com data depois de hoje (fuso de São Paulo).
+// As datas são 'AAAA-MM-DD', então comparar o texto já compara as datas.
+function recusarDataFutura(data: string) {
+  if (data > hojeEmSaoPaulo()) throw new BadRequestException('A data não pode ser no futuro.');
+}
 
 @Injectable()
 export class AcoesService {
@@ -30,6 +36,7 @@ export class AcoesService {
   }
 
   async criar(usuario: UsuarioToken, dados: AcaoDto) {
+    recusarDataFutura(dados.dataReferencia);
     const indicador = await this.indicadores.buscarDigitavel(dados.indicadorId);
     this.indicadores.validarPercentual(indicador, dados.valor);
     const periodo = await this.periodos.trimestreDaData(usuario.empresaId, dados.dataReferencia);
@@ -53,6 +60,7 @@ export class AcoesService {
   }
 
   async atualizar(empresaId: string, id: string, dados: AcaoDto) {
+    recusarDataFutura(dados.dataReferencia);
     const indicador = await this.indicadores.buscarDigitavel(dados.indicadorId);
     this.indicadores.validarPercentual(indicador, dados.valor);
     // Se a data mudou de trimestre, o lançamento muda de período junto.

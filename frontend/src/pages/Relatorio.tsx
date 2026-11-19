@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api, comPeriodo } from '../api';
 import SeletorPeriodo from '../components/SeletorPeriodo';
 import SeloStatus from '../components/SeloStatus';
-import { formatarCnpj, formatarNumero, formatarPercentual, PILARES } from '../formatos';
+import { formatarCnpj, formatarNumero, formatarPercentual, mediaMensal, PILARES } from '../formatos';
 import type { DadosRelatorio, LinhaRelatorio, Periodo } from '../tipos';
 
 // Variação do trimestre anterior para o atual e se isso foi melhora ou piora
@@ -21,8 +21,8 @@ function variacao(linha: LinhaRelatorio) {
   };
 }
 
-function valorOuTraco(valor: number | null, unidade: string) {
-  return valor === null ? '—' : `${formatarNumero(valor, 4)} ${unidade}`;
+function valorOuTraco(valor: number | null, unidade: string, codigo: string) {
+  return valor === null ? '—' : `${formatarNumero(valor, 4)} ${unidade}${mediaMensal(codigo)}`;
 }
 
 export default function Relatorio() {
@@ -113,8 +113,8 @@ export default function Relatorio() {
                       {linha.nome}
                       <small className="referencia">{linha.referencia}</small>
                     </td>
-                    <td className="numero">{valorOuTraco(linha.atual, linha.unidade)}</td>
-                    <td className="numero">{valorOuTraco(linha.anterior, linha.unidade)}</td>
+                    <td className="numero">{valorOuTraco(linha.atual, linha.unidade, linha.codigo)}</td>
+                    <td className="numero">{valorOuTraco(linha.anterior, linha.unidade, linha.codigo)}</td>
                     <td className={`numero ${v?.classe ?? ''}`}>{v?.texto ?? '—'}</td>
                   </tr>
                 );
@@ -144,9 +144,11 @@ export default function Relatorio() {
                     <td>{m.indicador}</td>
                     <td className="numero">
                       {formatarNumero(m.valor_base)} → {formatarNumero(m.valor_alvo)} {m.unidade}
+                      {mediaMensal(m.codigo)}
                     </td>
                     <td className="numero">
                       {formatarNumero(m.valor_atual)} {m.unidade}
+                      {mediaMensal(m.codigo)}
                     </td>
                     <td className="numero">{formatarPercentual(m.progresso)}</td>
                     <td>

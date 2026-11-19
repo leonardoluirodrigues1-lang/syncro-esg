@@ -1,6 +1,6 @@
 // Referência de cada indicador do catálogo nos padrões reconhecidos:
 //   GRI = item de divulgação dos GRI Standards; ODS = Objetivo de Desenvolvimento Sustentável da ONU.
-// "—" quando não há um equivalente claro.
+// Sem ODS equivalente claro, mostra só a referência GRI.
 export const REFERENCIAS: Record<string, string> = {
   'ENE-01': 'GRI 302-1 · ODS 7', // consumo de energia dentro da organização
   'AGU-01': 'GRI 303-5 · ODS 6', // consumo de água
@@ -10,7 +10,7 @@ export const REFERENCIAS: Record<string, string> = {
   'SOC-01': 'GRI 404-1 · ODS 4', // média de horas de treinamento por funcionário
   'SOC-02': 'GRI 405-1 · ODS 5', // diversidade nos órgãos de governança e empregados
   'SOC-03': 'GRI 401-1 · ODS 8', // novas contratações e rotatividade
-  'SOC-04': 'GRI 413-1 · ODS —', // operações com engajamento da comunidade local
+  'SOC-04': 'GRI 413-1', // operações com engajamento da comunidade local
   'GOV-01': 'GRI 2-23 · ODS 16', // compromissos de política
   'GOV-02': 'GRI 414-1 · ODS 8', // fornecedores selecionados com critérios sociais
 };

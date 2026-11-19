@@ -10,7 +10,7 @@ export default function Acoes() {
   const [indicadores, setIndicadores] = useState<Indicador[]>([]);
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
   const [periodoId, setPeriodoId] = useState('');
-  const [acoes, setAcoes] = useState<Acao[]>([]);
+  const [acoes, setAcoes] = useState<Acao[] | null>(null); // null = lista ainda carregando
   const [versao, setVersao] = useState(0); // muda para forçar o recarregamento da tabela
   const [formulario, setFormulario] = useState(FORMULARIO_VAZIO);
   const [editandoId, setEditandoId] = useState<string | null>(null);
@@ -27,6 +27,7 @@ export default function Acoes() {
 
   useEffect(() => {
     if (!periodoId) return;
+    setAcoes(null);
     api<Acao[]>(comPeriodo('/acoes', periodoId))
       .then(setAcoes)
       .catch((e) => setErro(e.message));
@@ -105,6 +106,8 @@ export default function Acoes() {
     try {
       await api(`/acoes/${acao.id}`, { metodo: 'DELETE' });
       if (editandoId === acao.id) limparFormulario();
+      setErro('');
+      setAviso('Lançamento excluído.'); // substitui a mensagem anterior (ex.: "Lançamento registrado.")
       setVersao((v) => v + 1);
     } catch (e) {
       setErro((e as Error).message);
@@ -161,7 +164,13 @@ export default function Acoes() {
           </label>
           <label>
             Data
-            <input type="date" value={formulario.data} onChange={(e) => alterar('data', e.target.value)} required />
+            <input
+              type="date"
+              max={hojeIso()} // não aceita data no futuro (o backend também recusa)
+              value={formulario.data}
+              onChange={(e) => alterar('data', e.target.value)}
+              required
+            />
           </label>
         </div>
 
@@ -196,7 +205,9 @@ export default function Acoes() {
           <h2>Lançamentos do trimestre</h2>
           <SeletorPeriodo periodos={periodos} valor={periodoId} aoMudar={setPeriodoId} />
         </div>
-        {acoes.length === 0 ? (
+        {acoes === null ? (
+          <p className="texto-suave">Carregando...</p>
+        ) : acoes.length === 0 ? (
           <p className="texto-suave">Nenhum lançamento neste trimestre.</p>
         ) : (
           <div className="tabela-rolavel">

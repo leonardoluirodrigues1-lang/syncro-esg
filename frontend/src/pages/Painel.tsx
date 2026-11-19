@@ -4,7 +4,7 @@ import { api, comPeriodo } from '../api';
 import Barra from '../components/Barra';
 import SeletorPeriodo from '../components/SeletorPeriodo';
 import SeloStatus from '../components/SeloStatus';
-import { formatarData, formatarNumero, formatarPercentual, PILARES } from '../formatos';
+import { formatarData, formatarNumero, formatarPercentual, mediaMensal, PILARES } from '../formatos';
 import type { DadosPainel } from '../tipos';
 
 const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -78,6 +78,7 @@ export default function Painel() {
                 <span className="texto-suave">
                   {formatarPercentual(m.progresso)} · {formatarNumero(m.valor_base)} → {formatarNumero(m.valor_alvo)}{' '}
                   {m.unidade}
+                  {mediaMensal(m.codigo)}
                 </span>
               </li>
             ))}

@@ -3,7 +3,7 @@ import { api, comPeriodo } from '../api';
 import Barra from '../components/Barra';
 import SeletorPeriodo from '../components/SeletorPeriodo';
 import SeloStatus from '../components/SeloStatus';
-import { agruparPorPilar, formatarNumero, formatarPercentual, periodoAtualId, PILARES } from '../formatos';
+import { agruparPorPilar, formatarNumero, formatarPercentual, mediaMensal, periodoAtualId, PILARES } from '../formatos';
 import type { Indicador, Meta, Periodo } from '../tipos';
 
 const FORMULARIO_VAZIO = { indicadorId: '', valorBase: '', valorAlvo: '' };
@@ -164,9 +164,12 @@ export default function Metas() {
                     </td>
                     <td className="numero">
                       {formatarNumero(m.valor_base)} → {formatarNumero(m.valor_alvo)} {m.unidade}
+                      {mediaMensal(m.codigo)}
                     </td>
                     <td className="numero">
-                      {m.lancamentos > 0 ? `${formatarNumero(m.valor_atual)} ${m.unidade}` : 'sem lançamentos'}
+                      {m.lancamentos > 0
+                        ? `${formatarNumero(m.valor_atual)} ${m.unidade}${mediaMensal(m.codigo)}`
+                        : 'sem lançamentos'}
                     </td>
                     <td className="celula-progresso">
                       <Barra fracao={m.progresso} cor={PILARES[m.pilar].cor} />

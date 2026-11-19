@@ -38,9 +38,15 @@ export function formatarCnpj(texto: string) {
     .replace(/(\d{4})(\d)/, '$1-$2');
 }
 
-// Data de hoje no formato do <input type="date"> (AAAA-MM-DD), no fuso local.
+// Data de hoje no formato do <input type="date"> (AAAA-MM-DD), no fuso de São Paulo (o mesmo do backend).
 export function hojeIso() {
-  return new Date().toLocaleDateString('en-CA');
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+}
+
+// A energia (ENE-01) é lançada mês a mês e o trimestre usa a média dos meses.
+// Sem esse aviso, o valor parece o total do trimestre (que só aparece no card de emissões).
+export function mediaMensal(codigo: string) {
+  return codigo === 'ENE-01' ? ' (média mensal)' : '';
 }
 
 export function periodoAtualId(periodos: Periodo[]) {
