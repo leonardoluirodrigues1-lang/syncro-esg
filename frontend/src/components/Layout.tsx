@@ -12,6 +12,10 @@ export default function Layout() {
 
   return (
     <div className="estrutura">
+      {/* Primeiro item do Tab: leva direto ao conteúdo, sem passar pelo menu. */}
+      <a href="#conteudo" className="pular-conteudo">
+        Pular para o conteúdo
+      </a>
       <aside className="menu-lateral">
         <div className="marca">
           Syncro <span>ESG</span>
@@ -31,7 +35,7 @@ export default function Layout() {
           </button>
         </div>
       </aside>
-      <main className="conteudo">
+      <main id="conteudo" className="conteudo" tabIndex={-1}>
         <Outlet />
       </main>
     </div>

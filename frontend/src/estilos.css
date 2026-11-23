@@ -50,6 +50,40 @@ a {
   color: var(--verde);
 }
 
+/* ----- Acessibilidade: foco visível e link para pular o menu ----- */
+
+/* Mesmo contorno verde em tudo que recebe foco pelo teclado (links, botões e campos). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+
+/* "Pular para o conteúdo": fica fora da tela e só aparece quando recebe foco (Tab). */
+.pular-conteudo {
+  position: absolute;
+  left: 8px;
+  top: -100px;
+  z-index: 100;
+  padding: 8px 14px;
+  background: var(--verde);
+  color: var(--branco);
+  border-radius: var(--raio);
+  font-weight: 600;
+}
+
+.pular-conteudo:focus {
+  top: 8px;
+}
+
+/* O <main> recebe foco pelo link acima só para o leitor de tela começar dali; não precisa de contorno. */
+.conteudo:focus {
+  outline: none;
+}
+
 /* ----- Estrutura: menu lateral + conteúdo ----- */
 
 .estrutura {
@@ -338,12 +372,6 @@ textarea {
   width: 100%;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: 2px solid var(--verde);
-  outline-offset: -1px;
-}
 
 .linha-campos {
   display: grid;
