@@ -9,11 +9,12 @@
   --borda: #e2e5e9;
   --fundo: #f5f6f4;
   --branco: #ffffff;
-  --ok: #2e7d32;
+  /* Textos de status escurecidos: contraste de pelo menos 4,5:1 sobre o fundo do selo (WCAG AA). */
+  --ok: #1b5e20; /* 6,9:1 sobre --ok-fundo */
   --ok-fundo: #e5f3e6;
-  --atencao: #b26a00;
+  --atencao: #8a5200; /* 5,8:1 sobre --atencao-fundo */
   --atencao-fundo: #fff2d9;
-  --risco: #c62828;
+  --risco: #c62828; /* 4,8:1 sobre --risco-fundo (já passava) */
   --risco-fundo: #fde7e7;
   --raio: 10px;
 }
