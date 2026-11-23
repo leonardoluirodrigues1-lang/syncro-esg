@@ -21,9 +21,9 @@ function variacao(linha: LinhaRelatorio) {
   };
 }
 
-// `vazio` é o texto mostrado quando não há valor (padrão "—").
-function valorOuTraco(valor: number | null, unidade: string, codigo: string, vazio = '—') {
-  return valor === null ? vazio : `${formatarNumero(valor, 4)} ${unidade}${mediaMensal(codigo)}`;
+// Sem valor no trimestre, a célula diz isso por extenso.
+function valorOuSemDado(valor: number | null, unidade: string, codigo: string) {
+  return valor === null ? 'sem dado' : `${formatarNumero(valor, 4)} ${unidade}${mediaMensal(codigo)}`;
 }
 
 export default function Relatorio() {
@@ -107,8 +107,8 @@ export default function Relatorio() {
             <tbody>
               {dados.indicadores.map((linha) => {
                 const v = variacao(linha);
-                // Sem dado no trimestre anterior: as colunas "anterior" e "variação" dizem isso por extenso.
-                const semAnterior = linha.anterior === null;
+                // Falta valor em um dos trimestres: a variação também mostra "sem dado".
+                const semDado = linha.atual === null || linha.anterior === null;
                 return (
                   <tr key={linha.codigo}>
                     <td>
@@ -116,9 +116,9 @@ export default function Relatorio() {
                       {linha.nome}
                       <small className="referencia">{linha.referencia}</small>
                     </td>
-                    <td className="numero">{valorOuTraco(linha.atual, linha.unidade, linha.codigo)}</td>
-                    <td className="numero">{valorOuTraco(linha.anterior, linha.unidade, linha.codigo, 'sem dado')}</td>
-                    <td className={`numero ${v?.classe ?? ''}`}>{v?.texto ?? (semAnterior ? 'sem dado' : '—')}</td>
+                    <td className="numero">{valorOuSemDado(linha.atual, linha.unidade, linha.codigo)}</td>
+                    <td className="numero">{valorOuSemDado(linha.anterior, linha.unidade, linha.codigo)}</td>
+                    <td className={`numero ${v?.classe ?? ''}`}>{v?.texto ?? (semDado ? 'sem dado' : '—')}</td>
                   </tr>
                 );
               })}
