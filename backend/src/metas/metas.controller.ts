@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { UsuarioLogado, type UsuarioToken } from '../auth/usuario-logado.decorator';
 import { validarId } from '../comum/validar-id.pipe';
 import { PeriodosService } from '../periodos/periodos.service';
-import { MetaDto } from './dto/meta.dto';
+import { MetaDto, MetaValoresDto } from './dto/meta.dto';
 import { MetasService } from './metas.service';
 
 @Controller('metas')
@@ -24,6 +24,15 @@ export class MetasController {
   @Post()
   criar(@UsuarioLogado() usuario: UsuarioToken, @Body() dados: MetaDto) {
     return this.metasService.criar(usuario.empresaId, dados);
+  }
+
+  @Put(':id')
+  editar(
+    @UsuarioLogado() usuario: UsuarioToken,
+    @Param('id', validarId()) id: string,
+    @Body() dados: MetaValoresDto,
+  ) {
+    return this.metasService.editar(usuario.empresaId, id, dados);
   }
 
   @Delete(':id')

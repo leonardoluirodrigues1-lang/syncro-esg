@@ -15,6 +15,7 @@ export default function Metas() {
   const [metas, setMetas] = useState<Meta[]>([]);
   const [versao, setVersao] = useState(0); // muda para forçar o recarregamento da lista
   const [formulario, setFormulario] = useState(FORMULARIO_VAZIO);
+  const [editandoId, setEditandoId] = useState<string | null>(null); // meta sendo editada (null = criando)
   const [erro, setErro] = useState('');
 
   const indicador = indicadores.find((i) => String(i.id) === formulario.indicadorId);
@@ -41,30 +42,49 @@ export default function Metas() {
     setFormulario({ ...formulario, [campo]: valor });
   }
 
+  function limparFormulario() {
+    setFormulario(FORMULARIO_VAZIO);
+    setEditandoId(null);
+  }
+
   async function salvar(evento: FormEvent) {
     evento.preventDefault();
     setErro('');
+    const valores = { valorBase: Number(formulario.valorBase), valorAlvo: Number(formulario.valorAlvo) };
     try {
-      await api('/metas', {
-        metodo: 'POST',
-        corpo: {
-          indicadorId: Number(formulario.indicadorId),
-          valorBase: Number(formulario.valorBase),
-          valorAlvo: Number(formulario.valorAlvo),
-          periodoId,
-        },
-      });
-      setFormulario(FORMULARIO_VAZIO);
+      if (editandoId) {
+        // Na edição só a base e o alvo mudam; indicador e trimestre continuam os mesmos.
+        await api(`/metas/${editandoId}`, { metodo: 'PUT', corpo: valores });
+      } else {
+        await api('/metas', {
+          metodo: 'POST',
+          corpo: { indicadorId: Number(formulario.indicadorId), ...valores, periodoId },
+        });
+      }
+      limparFormulario();
       setVersao((v) => v + 1);
     } catch (e) {
       setErro((e as Error).message);
     }
   }
 
+  // Preenche o formulário de cima com a meta escolhida, como na tela de ações.
+  function editar(meta: Meta) {
+    setEditandoId(meta.id);
+    setFormulario({
+      indicadorId: String(meta.indicador_id),
+      valorBase: String(meta.valor_base),
+      valorAlvo: String(meta.valor_alvo),
+    });
+    setErro('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function excluir(meta: Meta) {
     if (!window.confirm(`Excluir a meta de ${meta.indicador}?`)) return;
     try {
       await api(`/metas/${meta.id}`, { metodo: 'DELETE' });
+      if (editandoId === meta.id) limparFormulario();
       setVersao((v) => v + 1);
     } catch (e) {
       setErro((e as Error).message);
@@ -79,10 +99,14 @@ export default function Metas() {
       </header>
 
       <form className="cartao formulario" onSubmit={salvar}>
-        <h2>Nova meta para o {nomePeriodo}</h2>
+        <h2>{editandoId ? `Editar meta do ${nomePeriodo}` : `Nova meta para o ${nomePeriodo}`}</h2>
         <label>
           Indicador
-          <select value={formulario.indicadorId} onChange={(e) => alterar('indicadorId', e.target.value)} required>
+          <select
+            value={formulario.indicadorId} onChange={(e) => alterar('indicadorId', e.target.value)}
+            disabled={editandoId !== null} // o indicador não muda na edição
+            required
+          >
             <option value="">Selecione um indicador</option>
             {agruparPorPilar(indicadores).map((grupo) => (
               <optgroup key={grupo.pilar} label={PILARES[grupo.pilar].nome}>
@@ -132,8 +156,13 @@ export default function Metas() {
         {erro && <p className="mensagem-erro">{erro}</p>}
         <div className="botoes">
           <button type="submit" className="botao">
-            Criar meta
+            {editandoId ? 'Salvar alterações' : 'Criar meta'}
           </button>
+          {editandoId && (
+            <button type="button" className="botao botao-secundario" onClick={limparFormulario}>
+              Cancelar edição
+            </button>
+          )}
         </div>
       </form>
 
@@ -179,7 +208,10 @@ export default function Metas() {
                     <td>
                       <SeloStatus status={m.status} />
                     </td>
-                    <td>
+                    <td className="acoes-linha">
+                      <button type="button" className="botao-link" onClick={() => editar(m)}>
+                        Editar
+                      </button>
                       <button type="button" className="botao-link perigo" onClick={() => excluir(m)}>
                         Excluir
                       </button>

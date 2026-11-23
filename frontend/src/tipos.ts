@@ -36,6 +36,7 @@ export interface Acao {
 
 export interface Meta {
   id: string;
+  indicador_id: number;
   codigo: string;
   indicador: string;
   pilar: Pilar;

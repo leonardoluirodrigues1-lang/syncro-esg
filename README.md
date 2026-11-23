@@ -144,7 +144,7 @@ Sem `periodoId`, vale o trimestre atual (fuso de São Paulo).
 | GET    | `/acoes?periodoId=` | lançamentos do trimestre |
 | POST / PUT / DELETE | `/acoes`, `/acoes/:id` | cria, edita e exclui lançamentos (o trimestre vem da data) |
 | GET    | `/metas?periodoId=` | metas com progresso e status |
-| POST / DELETE | `/metas`, `/metas/:id` | cria e exclui metas |
+| POST / PUT / DELETE | `/metas`, `/metas/:id` | cria, edita (só base e alvo) e exclui metas |
 | GET    | `/painel?periodoId=` | tudo do painel em uma chamada |
 | GET    | `/relatorio?periodoId=` | dados do relatório (atual × anterior) |
 

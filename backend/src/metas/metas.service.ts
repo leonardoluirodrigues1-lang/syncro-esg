@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { BancoService } from '../banco/banco.service';
 import { IndicadoresService } from '../indicadores/indicadores.service';
 import { PeriodosService } from '../periodos/periodos.service';
-import { MetaDto } from './dto/meta.dto';
+import { MetaDto, MetaValoresDto } from './dto/meta.dto';
 
 @Injectable()
 export class MetasService {
@@ -26,16 +26,7 @@ export class MetasService {
   }
 
   async criar(empresaId: string, dados: MetaDto) {
-    const indicador = await this.indicadores.buscarDigitavel(dados.indicadorId);
-    this.indicadores.validarPercentual(indicador, dados.valorBase, dados.valorAlvo);
-
-    // A meta precisa apontar na direção em que o indicador melhora.
-    if (indicador.direcao === 'reduzir' && dados.valorAlvo >= dados.valorBase) {
-      throw new BadRequestException('Este indicador deve diminuir: o valor alvo precisa ser menor que o valor base.');
-    }
-    if (indicador.direcao === 'aumentar' && dados.valorAlvo <= dados.valorBase) {
-      throw new BadRequestException('Este indicador deve aumentar: o valor alvo precisa ser maior que o valor base.');
-    }
+    await this.validarValores(dados.indicadorId, dados);
 
     const periodo = await this.periodos.buscar(empresaId, dados.periodoId);
     try {
@@ -52,6 +43,39 @@ export class MetasService {
         throw new ConflictException('Já existe uma meta para este indicador neste trimestre.');
       }
       throw erro;
+    }
+  }
+
+  // Edita só a base e o alvo. O indicador e o trimestre da meta não mudam.
+  async editar(empresaId: string, id: string, dados: MetaValoresDto) {
+    // Filtrar pela empresa do token: meta de outra empresa responde 404, como se não existisse.
+    const [meta] = await this.banco.consultar<{ indicador_id: number }>(
+      'SELECT indicador_id FROM meta_esg WHERE id = ? AND empresa_id = ?',
+      [id, empresaId],
+    );
+    if (!meta) throw new NotFoundException('Meta não encontrada.');
+
+    await this.validarValores(meta.indicador_id, dados);
+    await this.banco.executar('UPDATE meta_esg SET valor_base = ?, valor_alvo = ? WHERE id = ? AND empresa_id = ?', [
+      dados.valorBase,
+      dados.valorAlvo,
+      id,
+      empresaId,
+    ]);
+    return { id };
+  }
+
+  // Regras usadas na criação e na edição: percentual até 100 e alvo na direção em que o indicador melhora
+  // (como a comparação é estrita, o alvo também nunca pode ser igual à base).
+  private async validarValores(indicadorId: number, dados: MetaValoresDto) {
+    const indicador = await this.indicadores.buscarDigitavel(indicadorId);
+    this.indicadores.validarPercentual(indicador, dados.valorBase, dados.valorAlvo);
+
+    if (indicador.direcao === 'reduzir' && dados.valorAlvo >= dados.valorBase) {
+      throw new BadRequestException('Este indicador deve diminuir: o valor alvo precisa ser menor que o valor base.');
+    }
+    if (indicador.direcao === 'aumentar' && dados.valorAlvo <= dados.valorBase) {
+      throw new BadRequestException('Este indicador deve aumentar: o valor alvo precisa ser maior que o valor base.');
     }
   }
 
