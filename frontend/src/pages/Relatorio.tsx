@@ -21,8 +21,9 @@ function variacao(linha: LinhaRelatorio) {
   };
 }
 
-function valorOuTraco(valor: number | null, unidade: string, codigo: string) {
-  return valor === null ? '—' : `${formatarNumero(valor, 4)} ${unidade}${mediaMensal(codigo)}`;
+// `vazio` é o texto mostrado quando não há valor (padrão "—").
+function valorOuTraco(valor: number | null, unidade: string, codigo: string, vazio = '—') {
+  return valor === null ? vazio : `${formatarNumero(valor, 4)} ${unidade}${mediaMensal(codigo)}`;
 }
 
 export default function Relatorio() {
@@ -106,6 +107,8 @@ export default function Relatorio() {
             <tbody>
               {dados.indicadores.map((linha) => {
                 const v = variacao(linha);
+                // Sem dado no trimestre anterior: as colunas "anterior" e "variação" dizem isso por extenso.
+                const semAnterior = linha.anterior === null;
                 return (
                   <tr key={linha.codigo}>
                     <td>
@@ -114,8 +117,8 @@ export default function Relatorio() {
                       <small className="referencia">{linha.referencia}</small>
                     </td>
                     <td className="numero">{valorOuTraco(linha.atual, linha.unidade, linha.codigo)}</td>
-                    <td className="numero">{valorOuTraco(linha.anterior, linha.unidade, linha.codigo)}</td>
-                    <td className={`numero ${v?.classe ?? ''}`}>{v?.texto ?? '—'}</td>
+                    <td className="numero">{valorOuTraco(linha.anterior, linha.unidade, linha.codigo, 'sem dado')}</td>
+                    <td className={`numero ${v?.classe ?? ''}`}>{v?.texto ?? (semAnterior ? 'sem dado' : '—')}</td>
                   </tr>
                 );
               })}
