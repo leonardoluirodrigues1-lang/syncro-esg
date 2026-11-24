@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, salvarToken } from '../api';
+import Folhas from '../components/Folhas';
 import { formatarCnpj } from '../formatos';
 
 export default function Cadastro() {
@@ -39,6 +40,7 @@ export default function Cadastro() {
 
   return (
     <div className="pagina-acesso">
+      <Folhas lugar="acesso" />
       <form className="cartao cartao-acesso cartao-cadastro" onSubmit={cadastrar}>
         <h1 className="marca">
           Syncro <span>ESG</span>

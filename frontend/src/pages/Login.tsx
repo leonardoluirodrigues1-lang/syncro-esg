@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, salvarToken } from '../api';
+import Folhas from '../components/Folhas';
 
 export default function Login() {
   const navegar = useNavigate();
@@ -26,6 +27,7 @@ export default function Login() {
 
   return (
     <div className="pagina-acesso">
+      <Folhas lugar="acesso" />
       <form className="cartao cartao-acesso" onSubmit={entrar}>
         <h1 className="marca">
           Syncro <span>ESG</span>

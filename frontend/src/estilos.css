@@ -825,3 +825,41 @@ input:disabled {
   margin: 0 0 10px;
   line-height: 1.5;
 }
+
+/* ----- Enfeite de folhas (componente Folhas) ----- */
+/* Fica atrás de tudo (z-index -1 dentro de um bloco com isolation), não recebe clique
+   e é bem transparente. Os cartões têm fundo branco, então a folha nunca aparece por cima deles. */
+.pagina-acesso,
+.menu-rodape,
+.conteudo {
+  position: relative;
+  isolation: isolate;
+}
+.folhas {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.12;
+}
+/* Login e cadastro: canto inferior esquerdo da tela. */
+.folhas-acesso {
+  left: 0;
+  bottom: 0;
+  width: 300px;
+  height: 110px;
+}
+/* Menu: canto direito do rodapé, atrás do nome da empresa e longe do botão Sair. */
+.folhas-menu {
+  right: -8px;
+  bottom: 30px;
+  width: 110px;
+  height: 40px;
+  opacity: 0.1;
+}
+/* Conteúdo: faixa de cima do canto direito, acima da linha do seletor de trimestre. */
+.folhas-conteudo {
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 44px;
+}

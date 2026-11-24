@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { api, sair } from '../api';
+import Folhas from './Folhas';
 import type { Perfil } from '../tipos';
 
 // O que o Layout entrega às páginas (lido com useOutletContext).
@@ -35,6 +36,7 @@ export default function Layout() {
           <NavLink to="/configuracoes">Configurações</NavLink>
         </nav>
         <div className="menu-rodape">
+          <Folhas lugar="menu" />
           <span className="menu-empresa">{perfil?.empresa ?? ''}</span>
           <button type="button" className="botao-sair" onClick={sair}>
             Sair
@@ -42,6 +44,7 @@ export default function Layout() {
         </div>
       </aside>
       <main id="conteudo" className="conteudo" tabIndex={-1}>
+        <Folhas lugar="conteudo" />
         {/* Configurações avisa aqui quando o nome da empresa muda: o rodapé do menu atualiza na hora. */}
         <Outlet
           context={
