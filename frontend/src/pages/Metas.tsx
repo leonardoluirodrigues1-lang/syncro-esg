@@ -124,6 +124,7 @@ export default function Metas() {
               </optgroup>
             ))}
           </select>
+          <small className="dica-campo">O que a empresa quer melhorar neste trimestre.</small>
         </label>
 
         {indicador && (
@@ -145,6 +146,7 @@ export default function Metas() {
               onChange={(e) => alterar('valorBase', e.target.value)}
               required
             />
+            <small className="dica-campo">Ponto de partida: quanto o indicador vale hoje, antes da meta.</small>
           </label>
           <label>
             Valor alvo
@@ -156,6 +158,7 @@ export default function Metas() {
               onChange={(e) => alterar('valorAlvo', e.target.value)}
               required
             />
+            <small className="dica-campo">Aonde a empresa quer chegar até o fim do trimestre.</small>
           </label>
         </div>
 

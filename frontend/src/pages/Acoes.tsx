@@ -142,6 +142,7 @@ export default function Acoes() {
               </optgroup>
             ))}
           </select>
+          <small className="dica-campo">O que está sendo medido. Cada indicador tem sua unidade (kWh, horas, %).</small>
         </label>
 
         {indicador && (
@@ -177,6 +178,9 @@ export default function Acoes() {
               onChange={(e) => alterar('data', e.target.value)}
               required
             />
+            <small className="dica-campo">
+              Dia a que o valor se refere (ex.: mês da conta de luz). Ela define em qual trimestre o lançamento entra.
+            </small>
           </label>
         </div>
 

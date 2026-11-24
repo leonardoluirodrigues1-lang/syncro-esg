@@ -747,3 +747,16 @@ td {
   color: var(--texto-suave);
   font-size: 14px;
 }
+
+/* Dica curta abaixo de um campo do formulário. */
+.dica-campo {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+.seletor-periodo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 260px;
+}
