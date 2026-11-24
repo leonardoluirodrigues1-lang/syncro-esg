@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, comPeriodo } from '../api';
+import Ajuda from '../components/Ajuda';
 import Barra from '../components/Barra';
 import SeletorPeriodo from '../components/SeletorPeriodo';
 import SeloStatus from '../components/SeloStatus';
@@ -177,6 +178,13 @@ export default function Metas() {
 
       <section className="cartao">
         <h2>Metas do trimestre</h2>
+        <Ajuda pergunta="O que significa o status?">
+          <p>
+            O sistema compara o progresso da meta com o tempo que já passou no trimestre. No prazo: no máximo 10
+            pontos atrás do tempo. Atenção: de 10 a 25 pontos atrás. Em risco: mais de 25 pontos atrás.
+          </p>
+          <p>Exemplo: com metade do trimestre passada (50%) e 30% de progresso, a meta está 20 pontos atrás: Atenção.</p>
+        </Ajuda>
         {metas.length === 0 ? (
           <p className="texto-suave">Nenhuma meta cadastrada neste trimestre.</p>
         ) : (

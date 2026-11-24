@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { api, comPeriodo } from '../api';
+import Ajuda from '../components/Ajuda';
 import Barra from '../components/Barra';
 import SeletorPeriodo from '../components/SeletorPeriodo';
 import SeloStatus from '../components/SeloStatus';
@@ -50,7 +51,12 @@ export default function Painel() {
           <span className="texto-suave">de 100 · {dados.periodo.nome}</span>
           {/* <details> abre e fecha sem JavaScript e funciona com teclado. */}
           <details className="como-calculado">
-            <summary>Como é calculado?</summary>
+            <summary>
+              <span className="ajuda-icone" aria-hidden="true">
+                ?
+              </span>{' '}
+              Como é calculado?
+            </summary>
             <p>
               Cada pilar = 70% do progresso médio das metas + 30% da cobertura (indicadores obrigatórios com
               lançamento no trimestre).
@@ -72,6 +78,13 @@ export default function Painel() {
       <section className="grade-duas-colunas">
         <div className="cartao">
           <h2>Metas do trimestre</h2>
+          <Ajuda pergunta="O que significa o status?">
+            <p>
+              O sistema compara o progresso da meta com o tempo que já passou no trimestre. No prazo: no máximo 10
+              pontos atrás do tempo. Atenção: de 10 a 25 pontos atrás. Em risco: mais de 25 pontos atrás.
+            </p>
+            <p>Exemplo: com metade do trimestre passada (50%) e 30% de progresso, a meta está 20 pontos atrás: Atenção.</p>
+          </Ajuda>
           {dados.metas.length === 0 && <p className="texto-suave">Nenhuma meta cadastrada neste trimestre.</p>}
           <ul className="lista-metas">
             {dados.metas.map((m) => (
@@ -94,13 +107,20 @@ export default function Painel() {
         <div className="coluna">
           <div className="cartao">
             <h2>Emissões (escopo 2)</h2>
+            <Ajuda pergunta="Como as emissões são calculadas?">
+              <p>
+                Escopo 2 são as emissões indiretas da energia elétrica que a empresa compra. Multiplicamos os kWh
+                lançados pelo fator de emissão do SIN (Sistema Interligado Nacional, a rede elétrica do país) do mês,
+                publicado pelo MCTI (Ministério da Ciência, Tecnologia e Inovação).
+              </p>
+            </Ajuda>
             <strong className="score-medio">{formatarNumero(dados.emissoes.tco2e, 4)} tCO₂e</strong>
             <p className="texto-suave">
-              Calculadas a partir de {formatarNumero(dados.emissoes.kwh)} kWh de energia elétrica lançados no trimestre.
+              Toneladas de CO₂ equivalente (tCO₂e), calculadas a partir de {formatarNumero(dados.emissoes.kwh)} kWh de energia elétrica lançados no trimestre.
             </p>
             {dados.emissoes.fatores.length > 0 && (
               <p className="referencia">
-                Fator do SIN usado:{' '}
+                Fator do SIN (Sistema Interligado Nacional) usado:{' '}
                 {dados.emissoes.fatores
                   .map((f) => `${formatarNumero(f.valor, 4)} tCO₂/MWh (${f.mes ? `${MESES[f.mes - 1]}/` : 'anual '}${f.ano})`)
                   .join('; ')}

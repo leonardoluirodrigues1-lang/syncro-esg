@@ -760,3 +760,23 @@ td {
   gap: 4px;
   max-width: 260px;
 }
+
+/* "?" que abre e fecha uma explicação (componente Ajuda). */
+.ajuda {
+  margin: -6px 0 12px;
+  color: var(--texto-suave);
+}
+.ajuda[open] {
+  color: var(--texto);
+}
+.ajuda-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-weight: 700;
+  font-size: 11px;
+}

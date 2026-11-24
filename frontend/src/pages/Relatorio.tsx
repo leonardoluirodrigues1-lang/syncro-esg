@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api, comPeriodo } from '../api';
+import Ajuda from '../components/Ajuda';
 import SeletorPeriodo from '../components/SeletorPeriodo';
 import SeloStatus from '../components/SeloStatus';
 import { formatarCnpj, formatarNumero, formatarPercentual, mediaMensal, PILARES } from '../formatos';
@@ -100,6 +101,17 @@ export default function Relatorio() {
         </section>
 
         <h3>Indicadores</h3>
+        <Ajuda pergunta="Como ler a variação?">
+          <p>
+            A variação mostra quanto o indicador mudou em relação ao trimestre anterior. Verde é melhora e vermelho é
+            piora. Nos indicadores que devem diminuir (como o consumo de energia), cair é bom. "sem dado" quer dizer
+            que faltou lançamento em um dos dois trimestres.
+          </p>
+          <p>
+            As referências abaixo de cada indicador vêm do GRI (Global Reporting Initiative, padrão internacional de
+            relatórios de sustentabilidade) e dos ODS (Objetivos de Desenvolvimento Sustentável da ONU).
+          </p>
+        </Ajuda>
         <div className="tabela-rolavel">
           <table>
             <thead>

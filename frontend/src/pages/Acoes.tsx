@@ -152,7 +152,10 @@ export default function Acoes() {
             {indicador.agregacao === 'soma'
               ? 'os lançamentos do trimestre são somados'
               : 'o trimestre usa a média dos lançamentos'}
-            <small className="referencia">Referência: {indicador.referencia}</small>
+            <small className="referencia">
+              Referência: {indicador.referencia} (GRI: padrão internacional de relatórios de sustentabilidade; ODS:
+              Objetivos de Desenvolvimento Sustentável da ONU)
+            </small>
           </p>
         )}
 
