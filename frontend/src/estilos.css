@@ -839,7 +839,7 @@ input:disabled {
   position: absolute;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.12;
+  opacity: 0.25; /* forte o bastante para aparecer no projetor */
 }
 /* Login e cadastro: canto inferior esquerdo da tela. */
 .folhas-acesso {
@@ -854,7 +854,6 @@ input:disabled {
   bottom: 30px;
   width: 110px;
   height: 40px;
-  opacity: 0.1;
 }
 /* Conteúdo: faixa de cima do canto direito, acima da linha do seletor de trimestre. */
 .folhas-conteudo {
