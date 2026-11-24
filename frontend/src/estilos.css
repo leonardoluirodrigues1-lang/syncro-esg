@@ -863,3 +863,13 @@ input:disabled {
   width: 120px;
   height: 44px;
 }
+@media (max-width: 479px) {
+  .folhas {
+    display: none;
+  }
+}
+@media print {
+  .folhas {
+    display: none;
+  }
+}
