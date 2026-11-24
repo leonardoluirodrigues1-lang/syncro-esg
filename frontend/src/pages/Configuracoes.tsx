@@ -3,6 +3,10 @@ import { api } from '../api';
 import { formatarCnpj } from '../formatos';
 import type { Perfil } from '../tipos';
 
+// Mesma regra do backend: a conta de demonstração não troca e-mail nem senha.
+const EMAIL_DEMO = 'demo@syncro.com';
+const MENSAGEM_DEMO = 'A conta de demonstração não permite trocar e-mail nem senha.';
+
 // Erro e aviso de sucesso de cada formulário, para as mensagens aparecerem no bloco certo.
 function useMensagens() {
   const [erro, setErro] = useState('');
@@ -52,6 +56,7 @@ export default function Configuracoes() {
 
   if (erroCarga) return <p className="mensagem-erro">{erroCarga}</p>;
   if (!perfil) return <p className="texto-suave">Carregando...</p>;
+  const demo = perfil.email === EMAIL_DEMO;
 
   function salvarEmpresa(evento: FormEvent) {
     evento.preventDefault();
@@ -146,9 +151,10 @@ export default function Configuracoes() {
                 type="email"
                 value={usuario.email}
                 onChange={(e) => setUsuario({ ...usuario, email: e.target.value })}
+                disabled={demo}
                 required
               />
-              <small className="dica-campo">É o e-mail usado para entrar no sistema.</small>
+              <small className="dica-campo">{demo ? MENSAGEM_DEMO : 'É o e-mail usado para entrar no sistema.'}</small>
             </label>
           </div>
           {msgUsuario.mensagens}
@@ -161,47 +167,51 @@ export default function Configuracoes() {
 
         <form className="formulario" onSubmit={trocarSenha}>
           <h3>Trocar senha</h3>
-          <label>
-            Senha atual
-            <input
-              type="password"
-              autoComplete="current-password"
-              value={senhas.senhaAtual}
-              onChange={(e) => setSenhas({ ...senhas, senhaAtual: e.target.value })}
-              required
-            />
-          </label>
-          <div className="linha-campos">
+          {demo && <p className="dica-campo">{MENSAGEM_DEMO}</p>}
+          {/* <fieldset disabled> desativa de uma vez todos os campos e o botão da troca de senha. */}
+          <fieldset disabled={demo}>
             <label>
-              Nova senha
+              Senha atual
               <input
                 type="password"
-                autoComplete="new-password"
-                minLength={6}
-                value={senhas.novaSenha}
-                onChange={(e) => setSenhas({ ...senhas, novaSenha: e.target.value })}
-                required
-              />
-              <small className="dica-campo">Mínimo de 6 caracteres.</small>
-            </label>
-            <label>
-              Confirme a nova senha
-              <input
-                type="password"
-                autoComplete="new-password"
-                minLength={6}
-                value={senhas.confirmacao}
-                onChange={(e) => setSenhas({ ...senhas, confirmacao: e.target.value })}
+                autoComplete="current-password"
+                value={senhas.senhaAtual}
+                onChange={(e) => setSenhas({ ...senhas, senhaAtual: e.target.value })}
                 required
               />
             </label>
-          </div>
-          {msgSenha.mensagens}
-          <div className="botoes">
-            <button type="submit" className="botao">
-              Trocar senha
-            </button>
-          </div>
+            <div className="linha-campos">
+              <label>
+                Nova senha
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={6}
+                  value={senhas.novaSenha}
+                  onChange={(e) => setSenhas({ ...senhas, novaSenha: e.target.value })}
+                  required
+                />
+                <small className="dica-campo">Mínimo de 6 caracteres.</small>
+              </label>
+              <label>
+                Confirme a nova senha
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={6}
+                  value={senhas.confirmacao}
+                  onChange={(e) => setSenhas({ ...senhas, confirmacao: e.target.value })}
+                  required
+                />
+              </label>
+            </div>
+            {msgSenha.mensagens}
+            <div className="botoes">
+              <button type="submit" className="botao">
+                Trocar senha
+              </button>
+            </div>
+          </fieldset>
         </form>
       </section>
 

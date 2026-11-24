@@ -1,4 +1,10 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { randomUUID } from 'node:crypto';
@@ -7,6 +13,11 @@ import { hojeEmSaoPaulo, PeriodosService } from '../periodos/periodos.service';
 import { CadastroDto } from './dto/cadastro.dto';
 import { LoginDto } from './dto/login.dto';
 import { PerfilDto, SenhaDto } from './dto/perfil.dto';
+
+// Conta de demonstração usada na apresentação: e-mail e senha não podem mudar,
+// senão ninguém mais consegue entrar com demo@syncro.com / demo1234.
+export const EMAIL_DEMO = 'demo@syncro.com';
+const MENSAGEM_DEMO = 'A conta de demonstração não permite trocar e-mail nem senha.';
 
 @Injectable()
 export class AuthService {
@@ -74,6 +85,9 @@ export class AuthService {
 
   async editarPerfil(usuarioId: string, dados: PerfilDto) {
     const email = dados.email.trim().toLowerCase();
+    // Na demo, o nome pode mudar (o seed restaura), mas o e-mail não.
+    const atual = await this.buscarPerfil(usuarioId);
+    if (atual.email === EMAIL_DEMO && email !== EMAIL_DEMO) throw new ForbiddenException(MENSAGEM_DEMO);
     // O e-mail é único: não pode ser o de outra conta (o próprio e-mail continua valendo).
     const [emailUsado] = await this.banco.consultar('SELECT 1 FROM usuario WHERE email = ? AND id <> ?', [
       email,
@@ -90,7 +104,8 @@ export class AuthService {
   }
 
   async trocarSenha(usuarioId: string, dados: SenhaDto) {
-    const [usuario] = await this.banco.consultar('SELECT senha_hash FROM usuario WHERE id = ?', [usuarioId]);
+    const [usuario] = await this.banco.consultar('SELECT email, senha_hash FROM usuario WHERE id = ?', [usuarioId]);
+    if (usuario?.email === EMAIL_DEMO) throw new ForbiddenException(MENSAGEM_DEMO);
     if (!usuario || !(await bcrypt.compare(dados.senhaAtual, usuario.senha_hash))) {
       throw new BadRequestException('Senha atual incorreta.');
     }
