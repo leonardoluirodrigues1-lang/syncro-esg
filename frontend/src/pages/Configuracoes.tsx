@@ -1,5 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '../api';
+import type { ContextoLayout } from '../components/Layout';
 import { formatarCnpj } from '../formatos';
 import type { Perfil } from '../tipos';
 
@@ -40,6 +42,7 @@ export default function Configuracoes() {
   const [usuario, setUsuario] = useState({ nome: '', email: '' });
   const [senhas, setSenhas] = useState({ senhaAtual: '', novaSenha: '', confirmacao: '' });
 
+  const { aoRenomearEmpresa } = useOutletContext<ContextoLayout>();
   const msgEmpresa = useMensagens();
   const msgUsuario = useMensagens();
   const msgSenha = useMensagens();
@@ -60,7 +63,10 @@ export default function Configuracoes() {
 
   function salvarEmpresa(evento: FormEvent) {
     evento.preventDefault();
-    msgEmpresa.enviar(() => api('/empresa', { metodo: 'PUT', corpo: empresa }), 'Dados da empresa salvos.');
+    msgEmpresa.enviar(async () => {
+      const salva = await api<{ nome: string }>('/empresa', { metodo: 'PUT', corpo: empresa });
+      aoRenomearEmpresa(salva.nome); // o Relatório já busca o nome de novo ao ser aberto
+    }, 'Dados da empresa salvos.');
   }
 
   function salvarUsuario(evento: FormEvent) {

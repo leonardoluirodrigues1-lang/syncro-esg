@@ -3,6 +3,11 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { api, sair } from '../api';
 import type { Perfil } from '../tipos';
 
+// O que o Layout entrega às páginas (lido com useOutletContext).
+export interface ContextoLayout {
+  aoRenomearEmpresa: (nome: string) => void;
+}
+
 export default function Layout() {
   const [perfil, setPerfil] = useState<Perfil | null>(null);
 
@@ -37,7 +42,12 @@ export default function Layout() {
         </div>
       </aside>
       <main id="conteudo" className="conteudo" tabIndex={-1}>
-        <Outlet />
+        {/* Configurações avisa aqui quando o nome da empresa muda: o rodapé do menu atualiza na hora. */}
+        <Outlet
+          context={
+            { aoRenomearEmpresa: (nome) => setPerfil((p) => (p ? { ...p, empresa: nome } : p)) } satisfies ContextoLayout
+          }
+        />
       </main>
     </div>
   );
