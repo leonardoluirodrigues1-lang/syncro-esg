@@ -1,4 +1,5 @@
 import type { Periodo } from '../tipos';
+import Ajuda from './Ajuda';
 
 interface Props {
   periodos: Periodo[];
@@ -11,7 +12,7 @@ export default function SeletorPeriodo({ periodos, valor, aoMudar }: Props) {
     <div className="seletor-periodo-grupo">
       <label className="seletor-periodo">
         Trimestre
-        <select value={valor} onChange={(e) => aoMudar(e.target.value)} aria-describedby="dica-trimestre">
+        <select value={valor} onChange={(e) => aoMudar(e.target.value)}>
           {periodos.map((p) => (
             <option key={p.id} value={p.id}>
               {p.nome}
@@ -19,10 +20,10 @@ export default function SeletorPeriodo({ periodos, valor, aoMudar }: Props) {
           ))}
         </select>
       </label>
-      {/* Fora do <label> porque o seletor fica em linha; o aria-describedby liga a dica ao campo. */}
-      <small id="dica-trimestre" className="dica-campo nao-imprimir">
-        Período de 3 meses (1º tri = jan a mar) que agrupa lançamentos e metas.
-      </small>
+      {/* "?" ao lado do seletor: a dica não cabe na linha do cabeçalho sem empurrar os botões. */}
+      <Ajuda pergunta="O que é o trimestre?" compacta>
+        <p>Período de 3 meses (1º tri = jan a mar) que agrupa lançamentos e metas.</p>
+      </Ajuda>
     </div>
   );
 }

@@ -756,9 +756,8 @@ td {
 }
 .seletor-periodo-grupo {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-width: 260px;
+  align-items: center;
+  gap: 8px;
 }
 
 /* "?" que abre e fecha uma explicação (componente Ajuda). */
@@ -779,4 +778,39 @@ td {
   border: 1px solid currentColor;
   font-weight: 700;
   font-size: 11px;
+}
+
+/* Versão compacta do "?": o texto abre flutuando abaixo, sem mudar o tamanho do cabeçalho. */
+.ajuda-compacta {
+  position: relative;
+  margin: 0;
+}
+.ajuda-compacta .ajuda-texto {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 10;
+  width: 240px;
+  padding: 10px 12px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Texto lido pelo leitor de tela, mas escondido na tela. */
+.so-leitor-de-tela {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+/* Sem o triângulo padrão do <summary>: na versão compacta fica só o "?". */
+.ajuda-compacta summary {
+  list-style: none;
+}
+.ajuda-compacta summary::-webkit-details-marker {
+  display: none;
 }
