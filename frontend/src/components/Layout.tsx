@@ -27,6 +27,7 @@ export default function Layout() {
           <NavLink to="/acoes">Registrar ações</NavLink>
           <NavLink to="/metas">Metas</NavLink>
           <NavLink to="/relatorio">Relatório</NavLink>
+          <NavLink to="/configuracoes">Configurações</NavLink>
         </nav>
         <div className="menu-rodape">
           <span className="menu-empresa">{perfil?.empresa ?? ''}</span>

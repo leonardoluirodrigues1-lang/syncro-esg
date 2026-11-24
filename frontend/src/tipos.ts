@@ -58,8 +58,15 @@ export interface Scores {
   geral: number;
 }
 
+// Usuário logado e a empresa dele (GET /auth/perfil).
 export interface Perfil {
+  id: string;
+  nome: string;
+  email: string;
   empresa: string;
+  cnpj: string;
+  setor: string | null;
+  porte: string | null;
 }
 
 export interface DadosPainel {

@@ -814,3 +814,14 @@ td {
 .ajuda-compacta summary::-webkit-details-marker {
   display: none;
 }
+
+/* Configurações: campo bloqueado (CNPJ) e texto do bloco "Sobre o Syncro". */
+input:disabled {
+  background: var(--fundo);
+  color: var(--texto-suave);
+  cursor: not-allowed;
+}
+.sobre p {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}

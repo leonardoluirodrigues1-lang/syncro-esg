@@ -4,6 +4,7 @@ import { lerToken } from "./api";
 import Layout from "./components/Layout";
 import Acoes from "./pages/Acoes";
 import Cadastro from "./pages/Cadastro";
+import Configuracoes from "./pages/Configuracoes";
 import Login from "./pages/Login";
 import Metas from "./pages/Metas";
 import Painel from "./pages/Painel";
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="/acoes" element={<Acoes />} />
         <Route path="/metas" element={<Metas />} />
         <Route path="/relatorio" element={<Relatorio />} />
+        <Route path="/configuracoes" element={<Configuracoes />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
