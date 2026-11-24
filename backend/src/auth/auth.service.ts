@@ -6,6 +6,7 @@ import { BancoService } from '../banco/banco.service';
 import { hojeEmSaoPaulo, PeriodosService } from '../periodos/periodos.service';
 import { CadastroDto } from './dto/cadastro.dto';
 import { LoginDto } from './dto/login.dto';
+import { PerfilDto, SenhaDto } from './dto/perfil.dto';
 
 @Injectable()
 export class AuthService {
@@ -61,7 +62,7 @@ export class AuthService {
   async buscarPerfil(usuarioId: string) {
     const [perfil] = await this.banco.consultar(
       `SELECT u.id, u.nome, u.email, u.papel,
-              e.id AS empresa_id, e.nome AS empresa, e.cnpj
+              e.id AS empresa_id, e.nome AS empresa, e.cnpj, e.setor, e.porte
        FROM usuario u
        JOIN empresa e ON e.id = u.empresa_id
        WHERE u.id = ?`,
@@ -69,6 +70,33 @@ export class AuthService {
     );
     if (!perfil) throw new UnauthorizedException('Usuário não encontrado. Faça login novamente.');
     return perfil;
+  }
+
+  async editarPerfil(usuarioId: string, dados: PerfilDto) {
+    const email = dados.email.trim().toLowerCase();
+    // O e-mail é único: não pode ser o de outra conta (o próprio e-mail continua valendo).
+    const [emailUsado] = await this.banco.consultar('SELECT 1 FROM usuario WHERE email = ? AND id <> ?', [
+      email,
+      usuarioId,
+    ]);
+    if (emailUsado) throw new ConflictException('Este e-mail já está em uso por outra conta.');
+
+    await this.banco.executar('UPDATE usuario SET nome = ?, email = ? WHERE id = ?', [
+      dados.nome.trim(),
+      email,
+      usuarioId,
+    ]);
+    return this.buscarPerfil(usuarioId);
+  }
+
+  async trocarSenha(usuarioId: string, dados: SenhaDto) {
+    const [usuario] = await this.banco.consultar('SELECT senha_hash FROM usuario WHERE id = ?', [usuarioId]);
+    if (!usuario || !(await bcrypt.compare(dados.senhaAtual, usuario.senha_hash))) {
+      throw new BadRequestException('Senha atual incorreta.');
+    }
+    const senhaHash = await bcrypt.hash(dados.novaSenha, 10);
+    await this.banco.executar('UPDATE usuario SET senha_hash = ? WHERE id = ?', [senhaHash, usuarioId]);
+    return { mensagem: 'Senha alterada.' };
   }
 
   // Token + perfil: o frontend guarda o token e mostra o nome da empresa.
