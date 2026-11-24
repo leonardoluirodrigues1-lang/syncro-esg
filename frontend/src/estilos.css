@@ -736,3 +736,14 @@ td {
 .como-calculado p {
   margin: 0.25rem 0 0;
 }
+
+/* Frase abaixo do título que explica para que serve cada tela. */
+.cabecalho-pagina h1 {
+  margin-bottom: 4px;
+}
+.descricao-pagina {
+  margin: 0;
+  max-width: 640px;
+  color: var(--texto-suave);
+  font-size: 14px;
+}

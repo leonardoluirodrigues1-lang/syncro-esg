@@ -117,7 +117,13 @@ export default function Acoes() {
   return (
     <>
       <header className="cabecalho-pagina">
-        <h1>Registrar ações</h1>
+        <div>
+          <h1>Registrar ações</h1>
+          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
+          <p className="descricao-pagina nao-imprimir">
+            Anote aqui o que a empresa mediu ou fez (consumo de energia, treinamentos, reuniões etc.). Escolha o indicador, informe o valor e a data e clique em Registrar.
+          </p>
+        </div>
       </header>
 
       <form className="cartao formulario" onSubmit={salvar}>

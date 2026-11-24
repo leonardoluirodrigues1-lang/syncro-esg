@@ -94,7 +94,13 @@ export default function Metas() {
   return (
     <>
       <header className="cabecalho-pagina">
-        <h1>Metas</h1>
+        <div>
+          <h1>Metas</h1>
+          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
+          <p className="descricao-pagina nao-imprimir">
+            Defina aonde a empresa quer chegar em cada indicador no trimestre. O sistema compara o progresso com o tempo que já passou.
+          </p>
+        </div>
         <SeletorPeriodo periodos={periodos} valor={periodoId} aoMudar={setPeriodoId} />
       </header>
 

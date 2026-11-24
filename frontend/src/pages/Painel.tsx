@@ -33,7 +33,13 @@ export default function Painel() {
   return (
     <>
       <header className="cabecalho-pagina">
-        <h1>Painel</h1>
+        <div>
+          <h1>Painel</h1>
+          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
+          <p className="descricao-pagina nao-imprimir">
+            Resumo do desempenho ESG da empresa no trimestre: notas, metas, emissões e últimos lançamentos. Escolha o trimestre ao lado para comparar.
+          </p>
+        </div>
         <SeletorPeriodo periodos={dados.periodos} valor={dados.periodo.id} aoMudar={setPeriodoId} />
       </header>
 

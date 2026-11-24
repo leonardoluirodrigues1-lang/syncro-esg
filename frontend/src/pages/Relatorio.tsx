@@ -50,7 +50,13 @@ export default function Relatorio() {
   return (
     <>
       <header className="cabecalho-pagina nao-imprimir">
-        <h1>Relatório</h1>
+        <div>
+          <h1>Relatório</h1>
+          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
+          <p className="descricao-pagina nao-imprimir">
+            Resumo do trimestre pronto para apresentar ou enviar. Confira os números e clique em Baixar PDF para salvar.
+          </p>
+        </div>
         <div className="botoes">
           <SeletorPeriodo periodos={periodos} valor={dados.periodo.id} aoMudar={setPeriodoId} />
           {/* O navegador gera o PDF pela opção "Salvar como PDF" da impressão. */}
