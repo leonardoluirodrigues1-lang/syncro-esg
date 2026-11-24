@@ -1,1 +1,4 @@
 .serena/
+
+# Cache do TypeScript gerado pelo build (tsc -b)
+*.tsbuildinfo
