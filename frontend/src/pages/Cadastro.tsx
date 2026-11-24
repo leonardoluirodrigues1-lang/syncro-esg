@@ -43,6 +43,10 @@ export default function Cadastro() {
         <h1 className="marca">
           Syncro <span>ESG</span>
         </h1>
+        <p className="texto-suave">
+          Registre as ações ambientais, sociais e de governança da sua empresa, acompanhe metas e gere o relatório
+          ESG do trimestre.
+        </p>
 
         <fieldset>
           <legend>Dados da empresa</legend>
