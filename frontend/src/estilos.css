@@ -856,19 +856,14 @@ input:disabled {
   height: 60px;
   opacity: 0.9;
 }
-/* Conteúdo: canto de cima à direita. O padding-top abaixo abre espaço para ela
-   não encostar no título nem no seletor de trimestre. */
+/* Conteúdo: canto inferior direito, atrás dos cartões (só aparece nos espaços vazios). */
 .folhas-conteudo {
-  top: 4px;
-  right: 4px;
+  top: auto;
+  bottom: 16px;
+  right: 16px;
   width: 210px;
   height: 84px;
   opacity: 0.85;
-}
-@media screen and (min-width: 480px) {
-  .conteudo {
-    padding-top: 96px;
-  }
 }
 /* Telas médias: tudo a ~70%. */
 @media screen and (min-width: 480px) and (max-width: 900px) {
@@ -884,9 +879,6 @@ input:disabled {
     width: 147px;
     height: 59px;
   }
-  .conteudo {
-    padding-top: 71px;
-  }
 }
 /* Até 860px o menu vira uma barra no topo: a folha vai para a esquerda do rodapé, na mesma linha. */
 @media (max-width: 860px) {
@@ -895,6 +887,12 @@ input:disabled {
     bottom: auto;
     top: 50%;
     transform: translateY(-50%);
+  }
+}
+/* Janela baixa com menu lateral: não sobra espaço acima do rodapé. */
+@media (max-height: 700px) and (min-width: 861px) {
+  .folhas-menu {
+    display: none;
   }
 }
 @media (max-width: 479px) {
