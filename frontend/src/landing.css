@@ -256,3 +256,69 @@
     font-size: 40px;
   }
 }
+
+/* ----- 3. Faixa de números (colunas separadas por linha, não cards) ----- */
+.l-numeros {
+  border-block: 1px solid var(--linha);
+}
+
+.l-numeros-grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-block: 0;
+}
+
+.l-numero {
+  padding: 36px 28px;
+  border-left: 1px solid var(--linha);
+}
+
+.l-numero:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.l-numero dt {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.l-numero dd {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--suave);
+}
+
+@media (max-width: 900px) {
+  .l-numeros-grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .l-numero {
+    padding: 28px 24px;
+  }
+  .l-numero:nth-child(odd) {
+    padding-left: 0;
+    border-left: none;
+  }
+  .l-numero:nth-child(n + 3) {
+    border-top: 1px solid var(--linha);
+  }
+}
+
+@media (max-width: 480px) {
+  .l-numeros-grade {
+    grid-template-columns: 1fr;
+  }
+  .l-numero,
+  .l-numero:nth-child(n) {
+    padding: 24px 0;
+    border-left: none;
+  }
+  .l-numero + .l-numero {
+    border-top: 1px solid var(--linha);
+  }
+}

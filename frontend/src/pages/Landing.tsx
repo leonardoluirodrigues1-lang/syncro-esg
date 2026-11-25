@@ -32,6 +32,7 @@ export default function Landing() {
       <Menu />
       <main id="principal" tabIndex={-1}>
         <Topo />
+        <Numeros />
         {/* seções */}
       </main>
     </div>
@@ -110,6 +111,30 @@ function Topo() {
           <figcaption>Tela do painel do Syncro com os dados da empresa de demonstração.</figcaption>
         </figure>
       </div>
+    </section>
+  );
+}
+
+// Conferidos no código: pesos em painel.service.ts, fórmula do pilar e fator em db/schema.sql,
+// ODS em indicadores/referencias.ts.
+const NUMEROS = [
+  ['40 · 30 · 30', 'Peso de Ambiental, Social e Governança na nota geral.'],
+  ['70 + 30', 'Nota de cada pilar: 70% progresso das metas, 30% cobertura dos indicadores.'],
+  ['0,0462', 'tCO₂ por MWh, fator do MCTI para a rede elétrica nacional (set/2026).'],
+  ['8 ODS', 'Metas ligadas aos ODS 4, 5, 6, 7, 8, 12, 13 e 16 da ONU.'],
+];
+
+function Numeros() {
+  return (
+    <section className="l-numeros" aria-label="O Syncro em números">
+      <dl className="l-caixa l-numeros-grade">
+        {NUMEROS.map(([numero, texto]) => (
+          <div key={numero} className="l-numero">
+            <dt>{numero}</dt>
+            <dd>{texto}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
