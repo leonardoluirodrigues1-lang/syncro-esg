@@ -4,14 +4,18 @@ import { lerToken } from "./api";
 import Layout from "./components/Layout";
 import Acoes from "./pages/Acoes";
 import Cadastro from "./pages/Cadastro";
+import Landing from "./pages/Landing";
 import Configuracoes from "./pages/Configuracoes";
 import Login from "./pages/Login";
 import Metas from "./pages/Metas";
 import Painel from "./pages/Painel";
 import Relatorio from "./pages/Relatorio";
 
+// Sem token: "/" mostra a landing pública; as outras rotas protegidas vão para o login.
 function AreaLogada() {
-  return lerToken() ? <Layout /> : <Navigate to="/login" replace />;
+  const { pathname } = useLocation();
+  if (lerToken()) return <Layout />;
+  return pathname === "/" ? <Landing /> : <Navigate to="/login" replace />;
 }
 
 // Login e cadastro: quem já está logado vai direto para o painel.
