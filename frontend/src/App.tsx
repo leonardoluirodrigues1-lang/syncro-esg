@@ -1,21 +1,29 @@
-import { useEffect, type ReactElement } from "react";
+import { lazy, Suspense, useEffect, type ReactElement } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { lerToken } from "./api";
 import Layout from "./components/Layout";
 import Acoes from "./pages/Acoes";
 import Cadastro from "./pages/Cadastro";
-import Landing from "./pages/Landing";
 import Configuracoes from "./pages/Configuracoes";
 import Login from "./pages/Login";
 import Metas from "./pages/Metas";
 import Painel from "./pages/Painel";
 import Relatorio from "./pages/Relatorio";
 
+// A landing vem num chunk separado: o CSS e as fontes dela não pesam nas telas internas.
+const Landing = lazy(() => import("./pages/Landing"));
+
 // Sem token: "/" mostra a landing pública; as outras rotas protegidas vão para o login.
 function AreaLogada() {
   const { pathname } = useLocation();
   if (lerToken()) return <Layout />;
-  return pathname === "/" ? <Landing /> : <Navigate to="/login" replace />;
+  return pathname === "/" ? (
+    <Suspense fallback={null}>
+      <Landing />
+    </Suspense>
+  ) : (
+    <Navigate to="/login" replace />
+  );
 }
 
 // Login e cadastro: quem já está logado vai direto para o painel.

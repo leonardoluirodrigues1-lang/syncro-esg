@@ -1,0 +1,6 @@
+/* Estilos só da landing pública (carregados junto com o chunk da Landing). */
+.landing {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #16211a;
+}
