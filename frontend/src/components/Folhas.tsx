@@ -23,7 +23,7 @@ export default function Folhas({
   lugar,
   tom = 'verde',
 }: {
-  lugar: 'acesso' | 'menu' | 'conteudo';
+  lugar: 'acesso' | 'menu' | 'conteudo' | 'topo' | 'nota' | 'cta'; // as três últimas são da landing
   tom?: 'verde' | 'claro';
 }) {
   const { galho, cores } = TONS[tom];

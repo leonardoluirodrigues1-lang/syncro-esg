@@ -759,3 +759,41 @@
   color: var(--tinta);
   font-weight: 500;
 }
+
+/* ----- 8. Folhas (componente Folhas; o global .folhas já tira o clique e esconde abaixo de 480px e no print) ----- */
+/* Topo e nota: dentro do fluxo, ocupando espaço próprio, então nunca encostam no texto. */
+.folhas.folhas-topo,
+.folhas.folhas-nota {
+  position: static;
+  width: 210px;
+  height: 84px;
+  flex-shrink: 0;
+}
+
+.folhas-topo {
+  align-self: flex-end;
+  margin-bottom: -4px;
+}
+
+.folhas-nota {
+  margin-top: 12px;
+  opacity: 0.85;
+}
+
+/* CTA: canto inferior direito, abaixo da linha do botão (o padding de baixo é maior que a folha). */
+.folhas-cta {
+  right: 24px;
+  bottom: 8px;
+  width: 210px;
+  height: 84px;
+  opacity: 0.9;
+}
+
+@media (min-width: 480px) and (max-width: 900px) {
+  .folhas.folhas-topo,
+  .folhas.folhas-nota,
+  .folhas-cta {
+    width: 147px;
+    height: 59px;
+  }
+}

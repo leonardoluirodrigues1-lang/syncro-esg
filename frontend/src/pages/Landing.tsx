@@ -8,6 +8,7 @@ import '@fontsource/public-sans/500.css';
 import '@fontsource/public-sans/600.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
+import Folhas from '../components/Folhas';
 import '../landing.css';
 
 const TITULO = 'Syncro ESG — metas ESG para pequenas empresas';
@@ -89,6 +90,7 @@ function Topo() {
             A sua pequena empresa já faz ESG. <em>O Syncro mostra quanto.</em>
           </h1>
           <div className="l-topo-lado">
+            <Folhas lugar="topo" />
             <p>
               Cadastre metas ambientais, sociais e de governança, lance os números do mês e veja no painel o que está
               em dia e o que ficou para trás. Feito para PMEs que não têm um time de sustentabilidade.
@@ -300,6 +302,7 @@ function Nota() {
             Toda nota que aparece no painel pode ser refeita à mão. Os pesos são fixos e estão aqui embaixo, então dá
             para conferir antes de confiar.
           </p>
+          <Folhas lugar="nota" />
         </div>
         <pre className="l-formulas">
           <code>{FORMULAS}</code>
@@ -312,6 +315,7 @@ function Nota() {
 function Chamada() {
   return (
     <section className="l-cta" aria-labelledby="titulo-cta">
+      <Folhas lugar="cta" tom="claro" />
       <div className="l-caixa l-cta-grade">
         <div className="l-cta-texto">
           <h2 id="titulo-cta">Veja o painel com os dados de uma empresa de demonstração.</h2>
