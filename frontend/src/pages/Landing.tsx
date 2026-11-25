@@ -34,6 +34,7 @@ export default function Landing() {
         <Topo />
         <Numeros />
         <ComoFunciona />
+        <Nota />
         {/* seções */}
       </main>
     </div>
@@ -278,6 +279,30 @@ function ComoFunciona() {
             </li>
           ))}
         </ol>
+      </div>
+    </section>
+  );
+}
+
+// Mesmas fórmulas de db/schema.sql (vw_score_pilar, vw_meta_status) e painel.service.ts.
+const FORMULAS = `nota do pilar = 0,7 × progresso das metas + 0,3 × cobertura
+nota geral    = 0,4 × Ambiental + 0,3 × Social + 0,3 × Governança
+status        = progresso comparado com o tempo já decorrido`;
+
+function Nota() {
+  return (
+    <section id="nota" className="l-nota" aria-labelledby="titulo-nota">
+      <div className="l-caixa l-nota-grade">
+        <div className="l-nota-texto">
+          <h2 id="titulo-nota">Sem caixa-preta.</h2>
+          <p>
+            Toda nota que aparece no painel pode ser refeita à mão. Os pesos são fixos e estão aqui embaixo, então dá
+            para conferir antes de confiar.
+          </p>
+        </div>
+        <pre className="l-formulas">
+          <code>{FORMULAS}</code>
+        </pre>
       </div>
     </section>
   );

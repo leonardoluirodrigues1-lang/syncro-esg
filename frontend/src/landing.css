@@ -616,3 +616,65 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ----- 5. Sem caixa-preta ----- */
+.l-nota {
+  background: var(--fundo-claro);
+  padding-block: 112px;
+}
+
+.l-nota-grade {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 72px;
+  align-items: start;
+}
+
+.l-nota-texto {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.l-nota h2 {
+  font-size: clamp(34px, 4vw, 52px);
+}
+
+.l-nota-texto p {
+  color: var(--suave);
+}
+
+.l-formulas {
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  padding: 28px 32px;
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 2;
+  color: var(--tinta);
+  overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  .l-nota {
+    padding-block: 80px;
+  }
+  .l-nota-grade {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .l-nota {
+    padding-block: 64px;
+  }
+  .l-formulas {
+    padding: 20px;
+    font-size: 13px;
+  }
+}
