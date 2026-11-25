@@ -322,3 +322,297 @@
     border-top: 1px solid var(--linha);
   }
 }
+
+/* Texto só para leitor de tela. */
+.l-so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.l-mono {
+  font-family: var(--mono);
+}
+
+/* ----- 4. Como funciona (zig-zag) ----- */
+.l-passos {
+  padding-block: 120px;
+}
+
+.l-passos h2 {
+  font-size: clamp(34px, 4vw, 52px);
+  max-width: 14em;
+}
+
+.l-passos-lista {
+  list-style: none;
+  margin: 72px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 104px;
+}
+
+.l-passo {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 72px;
+  align-items: center;
+}
+
+.l-passo-invertido {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+}
+
+.l-passo-invertido .l-passo-texto {
+  order: 2;
+}
+
+.l-passo-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Número em verde escuro: o verde #3a9b4c não chega a 4,5:1 como texto. */
+.l-passo-numero {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--verde-escuro);
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--verde);
+  align-self: flex-start;
+}
+
+.l-passo h3 {
+  font-size: clamp(28px, 2.6vw, 36px);
+}
+
+.l-passo-texto p {
+  color: var(--suave);
+}
+
+/* Moldura verde-clara em volta da mini-tela. */
+.l-moldura {
+  background: var(--fundo-claro);
+  border-radius: 12px;
+  padding: clamp(20px, 3.5vw, 44px);
+}
+
+.l-tela {
+  background: #ffffff;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  padding: 22px 24px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--tinta);
+}
+
+.landing .l-tela-titulo {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.l-campo-rotulo {
+  font-size: 12px;
+  color: var(--suave);
+}
+
+/* Tela 01: metas com barra, marcador de "hoje" e status (cores dos selos do app). */
+.l-metas,
+.l-relatorio-pilares {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.l-metas li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30% 74px;
+  align-items: center;
+  gap: 14px;
+}
+
+.l-meta-nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.l-metas .selo {
+  justify-self: start;
+}
+
+.l-barra {
+  position: relative;
+  display: block;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--fundo-claro);
+}
+
+.l-barra-cheia {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 99px;
+}
+
+.l-cor-no_prazo {
+  background: var(--ok);
+}
+.l-cor-atencao {
+  background: var(--atencao);
+}
+.l-cor-em_risco {
+  background: var(--risco);
+}
+.l-cor-pilar {
+  background: var(--verde);
+}
+
+.l-barra-hoje,
+.l-legenda-hoje {
+  width: 2px;
+  background: var(--tinta);
+}
+
+.l-barra-hoje {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+}
+
+.l-legenda-hoje {
+  display: inline-block;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+
+.landing .l-tela-legenda {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--suave);
+}
+
+/* Tela 02: formulário e conta. */
+.l-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.l-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.l-campo-valor {
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  padding: 9px 12px;
+}
+
+.l-conta {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--fundo-claro);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.l-conta strong {
+  font-weight: 500;
+  color: var(--verde-escuro);
+}
+
+/* Tela 03: mini relatório. */
+.l-relatorio-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.l-botao.l-botao-falso {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+.l-relatorio-geral {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--linha);
+}
+
+.l-relatorio-nota {
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.l-relatorio-pilares li {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 14px;
+}
+
+.l-relatorio-pilares .l-mono {
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .l-passos {
+    padding-block: 80px;
+  }
+  .l-passos-lista {
+    margin-top: 48px;
+    gap: 64px;
+  }
+  /* Texto em cima, tela embaixo. */
+  .l-passo,
+  .l-passo-invertido {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .l-passo-invertido .l-passo-texto {
+    order: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .l-passos {
+    padding-block: 64px;
+  }
+  .l-tela {
+    padding: 18px 16px;
+  }
+  .l-metas li {
+    grid-template-columns: minmax(0, 1fr) 74px;
+    row-gap: 6px;
+  }
+  .l-metas .l-barra {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .l-campos {
+    grid-template-columns: 1fr;
+  }
+}

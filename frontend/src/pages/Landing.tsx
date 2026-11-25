@@ -33,6 +33,7 @@ export default function Landing() {
       <main id="principal" tabIndex={-1}>
         <Topo />
         <Numeros />
+        <ComoFunciona />
         {/* seções */}
       </main>
     </div>
@@ -135,6 +136,149 @@ function Numeros() {
           </div>
         ))}
       </dl>
+    </section>
+  );
+}
+
+// Metas da empresa demo (seed-demo.mjs): 2 no prazo, 1 em atenção, 1 em risco.
+// Progresso ilustrativo, coerente com a regra da view: desvio = progresso - ritmo esperado.
+const RITMO_HOJE = 60;
+const METAS_DEMO: [string, number, 'no_prazo' | 'atencao' | 'em_risco', string][] = [
+  ['Consumo de energia elétrica', 62, 'no_prazo', 'No prazo'],
+  ['Fornecedores com código de conduta', 58, 'no_prazo', 'No prazo'],
+  ['Consumo de água', 42, 'atencao', 'Atenção'],
+  ['Mulheres em cargos de liderança', 28, 'em_risco', 'Em risco'],
+];
+
+const PILARES_DEMO: [string, number][] = [
+  ['Ambiental', 65],
+  ['Social', 40],
+  ['Governança', 71],
+];
+
+function TelaMetas() {
+  return (
+    <div className="l-tela">
+      <p className="l-tela-titulo">Metas do trimestre</p>
+      <ul className="l-metas">
+        {METAS_DEMO.map(([nome, progresso, status, rotulo]) => (
+          <li key={nome}>
+            <span className="l-meta-nome">{nome}</span>
+            <span className="l-barra">
+              <span className={`l-barra-cheia l-cor-${status}`} style={{ width: `${progresso}%` }} />
+              <span className="l-barra-hoje" style={{ left: `${RITMO_HOJE}%` }} />
+            </span>
+            <span className={`selo selo-${status}`}>{rotulo}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="l-tela-legenda">
+        <span className="l-legenda-hoje" /> onde a meta deveria estar hoje
+      </p>
+    </div>
+  );
+}
+
+function TelaEmissoes() {
+  return (
+    <div className="l-tela">
+      <p className="l-tela-titulo">Lançar consumo de energia</p>
+      <div className="l-campos">
+        <span className="l-campo">
+          <span className="l-campo-rotulo">Mês</span>
+          <span className="l-campo-valor">setembro de 2026</span>
+        </span>
+        <span className="l-campo">
+          <span className="l-campo-rotulo">Consumo (kWh)</span>
+          <span className="l-campo-valor l-mono">4.144</span>
+        </span>
+      </div>
+      <div className="l-conta">
+        <span className="l-campo-rotulo">Emissões do escopo 2</span>
+        <span className="l-mono">
+          4.144 kWh × 0,0462 tCO₂/MWh ÷ 1.000 = <strong>0,191 tCO₂e</strong>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TelaRelatorio() {
+  return (
+    <div className="l-tela">
+      <div className="l-relatorio-topo">
+        <p className="l-tela-titulo">Relatório ESG do trimestre</p>
+        <span className="l-botao l-botao-falso">Baixar PDF</span>
+      </div>
+      <div className="l-relatorio-geral">
+        <span className="l-mono l-relatorio-nota">59</span>
+        <span className="l-campo-rotulo">Nota geral</span>
+      </div>
+      <ul className="l-relatorio-pilares">
+        {PILARES_DEMO.map(([pilar, nota]) => (
+          <li key={pilar}>
+            <span>{pilar}</span>
+            <span className="l-barra">
+              <span className="l-barra-cheia l-cor-pilar" style={{ width: `${nota}%` }} />
+            </span>
+            <span className="l-mono">{nota}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const PASSOS = [
+  {
+    titulo: 'Avisa quando uma meta atrasou',
+    texto:
+      'Cada meta tem prazo. O Syncro compara o progresso com o tempo que já passou e marca o que está em dia, em atenção ou atrasado. Você não precisa abrir planilha nenhuma para saber.',
+    resumo:
+      'Exemplo de tela: quatro metas da empresa de demonstração. Consumo de energia e fornecedores com código de conduta estão no prazo, consumo de água está em atenção e mulheres em cargos de liderança está em risco.',
+    tela: <TelaMetas />,
+  },
+  {
+    titulo: 'Transforma conta de luz em emissões',
+    texto:
+      'Você lança o consumo em kWh. O sistema converte em toneladas de CO₂ do escopo 2 usando o fator oficial do MCTI para o Sistema Interligado Nacional.',
+    resumo:
+      'Exemplo de tela: 4.144 kWh em setembro de 2026, vezes 0,0462 tCO₂ por MWh, divididos por 1.000, dão 0,191 tonelada de CO₂ equivalente.',
+    tela: <TelaEmissoes />,
+  },
+  {
+    titulo: 'Gera o relatório que o cliente pede',
+    texto:
+      'Baixe em PDF um resumo por pilar, com metas, números e nota. Serve para o cliente, o banco ou o edital que pergunta o que a empresa faz em ESG.',
+    resumo: 'Exemplo de tela: relatório com nota geral 59, Ambiental 65, Social 40 e Governança 71, e o botão Baixar PDF.',
+    tela: <TelaRelatorio />,
+  },
+];
+
+function ComoFunciona() {
+  return (
+    <section id="como-funciona" className="l-passos" aria-labelledby="titulo-como-funciona">
+      <div className="l-caixa">
+        <h2 id="titulo-como-funciona">Três coisas que a planilha não faz por você.</h2>
+        <ol className="l-passos-lista">
+          {PASSOS.map((passo, i) => (
+            <li key={passo.titulo} className={i % 2 ? 'l-passo l-passo-invertido' : 'l-passo'}>
+              <div className="l-passo-texto">
+                <span className="l-passo-numero" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3>{passo.titulo}</h3>
+                <p>{passo.texto}</p>
+                <p className="l-so-leitor">{passo.resumo}</p>
+              </div>
+              {/* Mini-tela estática só para ver; o resumo acima é o que o leitor de tela lê. */}
+              <div className="l-moldura" aria-hidden="true">
+                {passo.tela}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }
