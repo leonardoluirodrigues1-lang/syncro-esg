@@ -20,13 +20,14 @@ export function salvarToken(token: string) {
   }
 }
 
-export function sair() {
+// Sair leva à landing; sessão expirada leva ao login, para entrar de novo.
+export function sair(destino = '/') {
   try {
     localStorage.removeItem(CHAVE_TOKEN);
   } catch {
     // nada a apagar
   }
-  window.location.href = '/login';
+  window.location.href = destino;
 }
 
 export function comPeriodo(caminho: string, periodoId: string) {
@@ -55,7 +56,7 @@ export async function api<T>(caminho: string, opcoes: Opcoes = {}): Promise<T> {
   }
 
   if (resposta.status === 401 && token) {
-    sair();
+    sair('/login');
     throw new Error('Sua sessão expirou. Faça login novamente.');
   }
 

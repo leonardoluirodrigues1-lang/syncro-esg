@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { lerToken } from '../api';
 // Fontes self-hosted (sem Google Fonts), só neste chunk. O Fontsource já usa font-display: swap.
 import '@fontsource/newsreader/400.css';
 import '@fontsource/newsreader/400-italic.css';
@@ -14,7 +15,20 @@ import '../landing.css';
 const TITULO = 'Syncro ESG — metas ESG para pequenas empresas';
 const DEMO = '/login?demo=1';
 
-// Página pública de apresentação, mostrada em "/" para quem não está logado.
+// Logado: no lugar de Entrar / Testar a demo / Entrar na demo, um único "Ir para o painel".
+function BotaoDemo({ texto, classe = 'l-botao' }: { texto: string; classe?: string }) {
+  return lerToken() ? (
+    <Link to="/painel" className={classe}>
+      Ir para o painel
+    </Link>
+  ) : (
+    <Link to={DEMO} className={classe}>
+      {texto}
+    </Link>
+  );
+}
+
+// Página pública de apresentação, sempre em "/" (logado ou não).
 export default function Landing() {
   // Só o <title> muda na landing; as metatags (description, og:*) ficam fixas no index.html.
   useEffect(() => {
@@ -69,12 +83,12 @@ function Menu() {
           <a href="#sobre">Sobre o projeto</a>
         </nav>
         <div className="l-menu-acoes">
-          <Link to="/login" className="l-link-entrar">
-            Entrar
-          </Link>
-          <Link to={DEMO} className="l-botao">
-            Testar a demo
-          </Link>
+          {!lerToken() && (
+            <Link to="/login" className="l-link-entrar">
+              Entrar
+            </Link>
+          )}
+          <BotaoDemo texto="Testar a demo" />
         </div>
       </div>
     </header>
@@ -96,9 +110,7 @@ function Topo() {
               em dia e o que ficou para trás. Feito para PMEs que não têm um time de sustentabilidade.
             </p>
             <div className="l-topo-acoes">
-              <Link to={DEMO} className="l-botao">
-                Testar a demo
-              </Link>
+              <BotaoDemo texto="Testar a demo" />
               <a href="#como-funciona" className="l-link-sublinhado">
                 Ver como funciona
               </a>
@@ -321,9 +333,7 @@ function Chamada() {
           <h2 id="titulo-cta">Veja o painel com os dados de uma empresa de demonstração.</h2>
           <p>Não precisa criar conta. A demo já vem com metas, lançamentos e relatório prontos.</p>
         </div>
-        <Link to={DEMO} className="l-botao l-botao-claro">
-          Entrar na demo
-        </Link>
+        <BotaoDemo texto="Entrar na demo" classe="l-botao l-botao-claro" />
       </div>
     </section>
   );

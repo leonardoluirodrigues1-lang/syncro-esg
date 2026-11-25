@@ -20,7 +20,7 @@ export default function Login() {
     try {
       const resposta = await api<{ token: string }>('/auth/login', { metodo: 'POST', corpo: { email, senha } });
       salvarToken(resposta.token);
-      navegar('/');
+      navegar('/painel');
     } catch (e) {
       setErro((e as Error).message);
     } finally {

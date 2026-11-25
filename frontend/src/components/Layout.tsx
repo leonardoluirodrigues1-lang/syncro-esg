@@ -27,7 +27,7 @@ export default function Layout() {
           Syncro <span>ESG</span>
         </div>
         <nav>
-          <NavLink to="/" end>
+          <NavLink to="/painel">
             Painel
           </NavLink>
           <NavLink to="/acoes">Registrar ações</NavLink>
@@ -38,7 +38,7 @@ export default function Layout() {
         <div className="menu-rodape">
           <Folhas lugar="menu" />
           <span className="menu-empresa">{perfil?.empresa ?? ''}</span>
-          <button type="button" className="botao-sair" onClick={sair}>
+          <button type="button" className="botao-sair" onClick={() => sair()}>
             Sair
           </button>
         </div>

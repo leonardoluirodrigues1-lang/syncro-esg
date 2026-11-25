@@ -13,22 +13,13 @@ import Relatorio from "./pages/Relatorio";
 // A landing vem num chunk separado: o CSS e as fontes dela não pesam nas telas internas.
 const Landing = lazy(() => import("./pages/Landing"));
 
-// Sem token: "/" mostra a landing pública; as outras rotas protegidas vão para o login.
 function AreaLogada() {
-  const { pathname } = useLocation();
-  if (lerToken()) return <Layout />;
-  return pathname === "/" ? (
-    <Suspense fallback={null}>
-      <Landing />
-    </Suspense>
-  ) : (
-    <Navigate to="/login" replace />
-  );
+  return lerToken() ? <Layout /> : <Navigate to="/login" replace />;
 }
 
 // Login e cadastro: quem já está logado vai direto para o painel.
 function SoDeslogado({ children }: { children: ReactElement }) {
-  return lerToken() ? <Navigate to="/" replace /> : children;
+  return lerToken() ? <Navigate to="/painel" replace /> : children;
 }
 
 export default function App() {
@@ -57,8 +48,17 @@ export default function App() {
           </SoDeslogado>
         }
       />
+      {/* A landing fica sempre em "/", logado ou não. */}
+      <Route
+        path="/"
+        element={
+          <Suspense fallback={null}>
+            <Landing />
+          </Suspense>
+        }
+      />
       <Route element={<AreaLogada />}>
-        <Route path="/" element={<Painel />} />
+        <Route path="/painel" element={<Painel />} />
         <Route path="/acoes" element={<Acoes />} />
         <Route path="/metas" element={<Metas />} />
         <Route path="/relatorio" element={<Relatorio />} />

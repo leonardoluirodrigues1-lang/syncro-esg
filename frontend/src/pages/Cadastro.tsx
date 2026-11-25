@@ -30,7 +30,7 @@ export default function Cadastro() {
       const corpo = { ...dados, setor: dados.setor || undefined, porte: dados.porte || undefined };
       const resposta = await api<{ token: string }>('/auth/cadastro', { metodo: 'POST', corpo });
       salvarToken(resposta.token);
-      navegar('/');
+      navegar('/painel');
     } catch (e) {
       setErro((e as Error).message);
     } finally {
