@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, comPeriodo } from '../api';
+import CabecalhoPagina from '../components/CabecalhoPagina';
 import SeletorPeriodo from '../components/SeletorPeriodo';
 import { agruparPorPilar, formatarData, formatarNumero, hojeIso, periodoAtualId, PILARES } from '../formatos';
 import type { Acao, Indicador, Periodo } from '../tipos';
@@ -116,15 +117,7 @@ export default function Acoes() {
 
   return (
     <>
-      <header className="cabecalho-pagina">
-        <div>
-          <h1>Registrar ações</h1>
-          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
-          <p className="descricao-pagina nao-imprimir">
-            Anote aqui o que a empresa mediu ou fez (consumo de energia, treinamentos, reuniões etc.). Escolha o indicador, informe o valor e a data e clique em Registrar.
-          </p>
-        </div>
-      </header>
+      <CabecalhoPagina titulo="Registrar ações" descricao="Anote aqui o que a empresa mediu ou fez (consumo de energia, treinamentos, reuniões etc.). Escolha o indicador, informe o valor e a data e clique em Registrar." />
 
       <form className="cartao formulario" onSubmit={salvar}>
         <h2>{editandoId ? 'Editar lançamento' : 'Novo lançamento'}</h2>

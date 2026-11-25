@@ -830,8 +830,7 @@ input:disabled {
 /* Fica atrás de tudo (z-index -1 dentro de um bloco com isolation) e não recebe clique.
    Os cartões têm fundo branco, então a folha nunca aparece por cima deles. */
 .pagina-acesso,
-.menu-rodape,
-.conteudo {
+.menu-rodape {
   position: relative;
   isolation: isolate;
 }
@@ -856,14 +855,16 @@ input:disabled {
   height: 60px;
   opacity: 0.9;
 }
-/* Conteúdo: canto inferior direito, atrás dos cartões (só aparece nos espaços vazios). */
-.folhas-conteudo {
-  top: auto;
-  bottom: 16px;
-  right: 16px;
-  width: 210px;
-  height: 84px;
-  opacity: 0.85;
+/* Conteúdo: no fluxo do cabeçalho da página, entre o título e o seletor, sem ficar atrás de nada.
+   Base 0 e crescimento até 120px: nunca empurra o seletor para outra linha, só ocupa o espaço que sobra. */
+.folhas.folhas-conteudo {
+  position: static;
+  z-index: auto;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 120px;
+  height: 48px;
+  margin-left: auto;
 }
 /* Telas médias: tudo a ~70%. */
 @media screen and (min-width: 480px) and (max-width: 900px) {
@@ -874,10 +875,6 @@ input:disabled {
   .folhas-menu {
     width: 105px;
     height: 42px;
-  }
-  .folhas-conteudo {
-    width: 147px;
-    height: 59px;
   }
 }
 /* Até 860px o menu vira uma barra no topo: a folha vai para a esquerda do rodapé, na mesma linha. */
@@ -892,6 +889,12 @@ input:disabled {
 /* Janela baixa com menu lateral: não sobra espaço acima do rodapé. */
 @media (max-height: 700px) and (min-width: 861px) {
   .folhas-menu {
+    display: none;
+  }
+}
+/* Sem espaço sobrando no cabeçalho: a folha do conteúdo some. */
+@media (max-width: 900px) {
+  .folhas.folhas-conteudo {
     display: none;
   }
 }

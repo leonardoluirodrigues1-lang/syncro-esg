@@ -44,7 +44,6 @@ export default function Layout() {
         </div>
       </aside>
       <main id="conteudo" className="conteudo" tabIndex={-1}>
-        <Folhas lugar="conteudo" />
         {/* Configurações avisa aqui quando o nome da empresa muda: o rodapé do menu atualiza na hora. */}
         <Outlet
           context={

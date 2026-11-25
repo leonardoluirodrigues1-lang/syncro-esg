@@ -3,6 +3,7 @@ import { api, comPeriodo } from '../api';
 import Ajuda from '../components/Ajuda';
 import Barra from '../components/Barra';
 import SeletorPeriodo from '../components/SeletorPeriodo';
+import CabecalhoPagina from '../components/CabecalhoPagina';
 import SeloStatus from '../components/SeloStatus';
 import { agruparPorPilar, formatarNumero, formatarPercentual, mediaMensal, periodoAtualId, PILARES } from '../formatos';
 import type { Indicador, Meta, Periodo } from '../tipos';
@@ -94,16 +95,9 @@ export default function Metas() {
 
   return (
     <>
-      <header className="cabecalho-pagina">
-        <div>
-          <h1>Metas</h1>
-          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
-          <p className="descricao-pagina nao-imprimir">
-            Defina aonde a empresa quer chegar em cada indicador no trimestre. O sistema compara o progresso com o tempo que já passou.
-          </p>
-        </div>
+      <CabecalhoPagina titulo="Metas" descricao="Defina aonde a empresa quer chegar em cada indicador no trimestre. O sistema compara o progresso com o tempo que já passou.">
         <SeletorPeriodo periodos={periodos} valor={periodoId} aoMudar={setPeriodoId} />
-      </header>
+      </CabecalhoPagina>
 
       <form className="cartao formulario" onSubmit={salvar}>
         <h2>{editandoId ? `Editar meta do ${nomePeriodo}` : `Nova meta para o ${nomePeriodo}`}</h2>

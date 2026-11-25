@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api, comPeriodo } from '../api';
 import Ajuda from '../components/Ajuda';
 import SeletorPeriodo from '../components/SeletorPeriodo';
+import CabecalhoPagina from '../components/CabecalhoPagina';
 import SeloStatus from '../components/SeloStatus';
 import { formatarCnpj, formatarNumero, formatarPercentual, mediaMensal, PILARES } from '../formatos';
 import type { DadosRelatorio, LinhaRelatorio, Periodo } from '../tipos';
@@ -50,14 +51,7 @@ export default function Relatorio() {
 
   return (
     <>
-      <header className="cabecalho-pagina nao-imprimir">
-        <div>
-          <h1>Relatório</h1>
-          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
-          <p className="descricao-pagina nao-imprimir">
-            Resumo do trimestre pronto para apresentar ou enviar. Confira os números e clique em Baixar PDF para salvar.
-          </p>
-        </div>
+      <CabecalhoPagina titulo="Relatório" descricao="Resumo do trimestre pronto para apresentar ou enviar. Confira os números e clique em Baixar PDF para salvar." classe="nao-imprimir">
         <div className="botoes">
           <SeletorPeriodo periodos={periodos} valor={dados.periodo.id} aoMudar={setPeriodoId} />
           {/* O navegador gera o PDF pela opção "Salvar como PDF" da impressão. */}
@@ -65,7 +59,7 @@ export default function Relatorio() {
             Baixar PDF
           </button>
         </div>
-      </header>
+      </CabecalhoPagina>
 
       <article className="cartao relatorio">
         <header className="relatorio-cabecalho">

@@ -4,6 +4,7 @@ import { api, comPeriodo } from '../api';
 import Ajuda from '../components/Ajuda';
 import Barra from '../components/Barra';
 import SeletorPeriodo from '../components/SeletorPeriodo';
+import CabecalhoPagina from '../components/CabecalhoPagina';
 import SeloStatus from '../components/SeloStatus';
 import { formatarData, formatarNumero, formatarPercentual, mediaMensal, PILARES } from '../formatos';
 import type { DadosPainel } from '../tipos';
@@ -33,16 +34,9 @@ export default function Painel() {
 
   return (
     <>
-      <header className="cabecalho-pagina">
-        <div>
-          <h1>Painel</h1>
-          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
-          <p className="descricao-pagina nao-imprimir">
-            Resumo do desempenho ESG da empresa no trimestre: notas, metas, emissões e últimos lançamentos. Escolha o trimestre ao lado para comparar.
-          </p>
-        </div>
+      <CabecalhoPagina titulo="Painel" descricao="Resumo do desempenho ESG da empresa no trimestre: notas, metas, emissões e últimos lançamentos. Escolha o trimestre ao lado para comparar.">
         <SeletorPeriodo periodos={dados.periodos} valor={dados.periodo.id} aoMudar={setPeriodoId} />
-      </header>
+      </CabecalhoPagina>
 
       <section className="grade-scores">
         <div className="cartao cartao-score-geral">

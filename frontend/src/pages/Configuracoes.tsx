@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { api } from '../api';
+import CabecalhoPagina from '../components/CabecalhoPagina';
 import type { ContextoLayout } from '../components/Layout';
 import { formatarCnpj } from '../formatos';
 import type { Perfil } from '../tipos';
@@ -92,16 +93,7 @@ export default function Configuracoes() {
 
   return (
     <>
-      <header className="cabecalho-pagina">
-        <div>
-          <h1>Configurações</h1>
-          {/* Frase de apoio: para que serve a tela e qual é a ação principal. */}
-          <p className="descricao-pagina nao-imprimir">
-            Atualize os dados da empresa e os seus dados de acesso. Altere o que precisar e clique no botão de salvar
-            do bloco.
-          </p>
-        </div>
-      </header>
+      <CabecalhoPagina titulo="Configurações" descricao="Atualize os dados da empresa e os seus dados de acesso. Altere o que precisar e clique no botão de salvar do bloco." />
 
       <form className="cartao formulario" onSubmit={salvarEmpresa}>
         <h2>Dados da empresa</h2>
