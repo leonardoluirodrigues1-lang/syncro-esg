@@ -35,6 +35,7 @@ export default function Landing() {
         <Numeros />
         <ComoFunciona />
         <Nota />
+        <Chamada />
         {/* seções */}
       </main>
     </div>
@@ -303,6 +304,22 @@ function Nota() {
         <pre className="l-formulas">
           <code>{FORMULAS}</code>
         </pre>
+      </div>
+    </section>
+  );
+}
+
+function Chamada() {
+  return (
+    <section className="l-cta" aria-labelledby="titulo-cta">
+      <div className="l-caixa l-cta-grade">
+        <div className="l-cta-texto">
+          <h2 id="titulo-cta">Veja o painel com os dados de uma empresa de demonstração.</h2>
+          <p>Não precisa criar conta. A demo já vem com metas, lançamentos e relatório prontos.</p>
+        </div>
+        <Link to={DEMO} className="l-botao l-botao-claro">
+          Entrar na demo
+        </Link>
       </div>
     </section>
   );

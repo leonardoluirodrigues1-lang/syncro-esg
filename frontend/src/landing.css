@@ -678,3 +678,65 @@
     font-size: 13px;
   }
 }
+
+/* ----- 6. Chamada final ----- */
+.l-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--verde-escuro);
+  color: #ffffff;
+  padding-block: 104px;
+}
+
+.l-cta-grade {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 48px;
+}
+
+.l-cta-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 720px;
+}
+
+.l-cta h2 {
+  font-size: clamp(32px, 3.6vw, 48px);
+}
+
+.l-cta p {
+  color: #cfe6d3; /* 7,9:1 sobre o verde escuro */
+}
+
+.l-botao.l-botao-claro {
+  background: #ffffff;
+  color: var(--verde-escuro) !important;
+}
+
+.l-botao.l-botao-claro:hover {
+  background: var(--fundo-claro);
+}
+
+.l-cta a:focus-visible {
+  outline-color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .l-cta {
+    padding-block: 80px;
+  }
+  .l-cta-grade {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .l-cta {
+    padding-block: 64px;
+  }
+}
