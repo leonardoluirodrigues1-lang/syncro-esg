@@ -31,6 +31,7 @@ export default function Landing() {
       </a>
       <Menu />
       <main id="principal" tabIndex={-1}>
+        <Topo />
         {/* seções */}
       </main>
     </div>
@@ -72,5 +73,43 @@ function Menu() {
         </div>
       </div>
     </header>
+  );
+}
+
+function Topo() {
+  return (
+    <section className="l-topo" aria-labelledby="titulo-topo">
+      <div className="l-caixa">
+        <div className="l-topo-grade">
+          <h1 id="titulo-topo">
+            A sua pequena empresa já faz ESG. <em>O Syncro mostra quanto.</em>
+          </h1>
+          <div className="l-topo-lado">
+            <p>
+              Cadastre metas ambientais, sociais e de governança, lance os números do mês e veja no painel o que está
+              em dia e o que ficou para trás. Feito para PMEs que não têm um time de sustentabilidade.
+            </p>
+            <div className="l-topo-acoes">
+              <Link to={DEMO} className="l-botao">
+                Testar a demo
+              </Link>
+              <a href="#como-funciona" className="l-link-sublinhado">
+                Ver como funciona
+              </a>
+            </div>
+          </div>
+        </div>
+        <figure className="l-topo-figura">
+          <img
+            src="/landing/landing-painel.webp"
+            width={1200}
+            height={750}
+            fetchPriority="high"
+            alt="Painel do Syncro ESG: nota geral da empresa, notas de Ambiental, Social e Governança, situação das metas do trimestre, emissões de CO₂ e últimos lançamentos."
+          />
+          <figcaption>Tela do painel do Syncro com os dados da empresa de demonstração.</figcaption>
+        </figure>
+      </div>
+    </section>
   );
 }
