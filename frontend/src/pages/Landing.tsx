@@ -36,8 +36,8 @@ export default function Landing() {
         <ComoFunciona />
         <Nota />
         <Chamada />
-        {/* seções */}
       </main>
+      <Rodape />
     </div>
   );
 }
@@ -322,5 +322,16 @@ function Chamada() {
         </Link>
       </div>
     </section>
+  );
+}
+
+function Rodape() {
+  return (
+    <footer id="sobre" className="l-rodape">
+      <div className="l-caixa l-rodape-linha">
+        <p>Syncro ESG · Projeto Integrador 2 · IFSP São José do Rio Preto, 2026</p>
+        <p>Leonardo Luís Rodrigues e Cauê Alberto André · Orientação: Profa. Dra. Lairce Castanhera</p>
+      </div>
+    </footer>
   );
 }

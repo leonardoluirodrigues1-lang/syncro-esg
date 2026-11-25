@@ -740,3 +740,22 @@
     padding-block: 64px;
   }
 }
+
+/* ----- 7. Rodapé ----- */
+.l-rodape {
+  padding-block: 40px;
+  font-size: 14px;
+  color: var(--suave);
+}
+
+.l-rodape-linha {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+}
+
+.l-rodape-linha p:first-child {
+  color: var(--tinta);
+  font-weight: 500;
+}
