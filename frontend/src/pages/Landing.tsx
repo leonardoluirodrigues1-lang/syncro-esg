@@ -15,6 +15,7 @@ export default function Landing() {
     <main className="landing">
       <h1>A sua pequena empresa já faz ESG. O Syncro mostra quanto.</h1>
       <Link to="/login">Entrar</Link>
+      <Link to="/login?demo=1">Testar a demo</Link>
     </main>
   );
 }

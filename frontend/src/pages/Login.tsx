@@ -1,12 +1,15 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, salvarToken } from '../api';
 import Folhas from '../components/Folhas';
 
 export default function Login() {
   const navegar = useNavigate();
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  // "Testar a demo" na landing chega com ?demo=1: a conta demo já vem preenchida, falta só clicar em Entrar.
+  const [parametros] = useSearchParams();
+  const demo = parametros.get('demo') === '1';
+  const [email, setEmail] = useState(demo ? 'demo@syncro.com' : '');
+  const [senha, setSenha] = useState(demo ? 'demo1234' : '');
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
 
