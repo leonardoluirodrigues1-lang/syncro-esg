@@ -1,6 +1,168 @@
 /* Estilos só da landing pública (carregados junto com o chunk da Landing). */
 .landing {
+  --tinta: #16211a;
+  --suave: #4a564e; /* 7,6:1 sobre branco, 6,9:1 sobre --fundo-claro */
+  --verde: #3a9b4c; /* só em formas (folha, barras): como texto não chega a 4,5:1 */
+  --verde-escuro: #1f4d2b;
+  --linha: #dce1dd;
+  --fundo-claro: #eef4ef;
+  --margem: clamp(16px, 8.33vw, 120px); /* 120px de cada lado em 1440px */
+  --serifa: 'Newsreader', Georgia, serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
   min-height: 100vh;
   background: #ffffff;
-  color: #16211a;
+  color: var(--tinta);
+  font-family: 'Public Sans', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.landing main:focus {
+  outline: none;
+}
+
+.landing h1,
+.landing h2,
+.landing h3 {
+  font-family: var(--serifa);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  margin: 0;
+}
+
+.landing p {
+  margin: 0;
+}
+
+.landing a {
+  color: inherit;
+}
+
+.landing a:focus-visible {
+  outline: 2px solid var(--verde-escuro);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Âncoras do menu: rolagem suave só para quem não pediu menos movimento. */
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.landing) {
+    scroll-behavior: smooth;
+  }
+}
+
+.landing [id] {
+  scroll-margin-top: 24px;
+}
+
+.l-caixa {
+  width: min(1200px, 100% - 2 * var(--margem));
+  margin-inline: auto;
+}
+
+/* Botão principal (verde escuro, raio 6px). */
+.l-botao {
+  display: inline-block;
+  padding: 11px 20px;
+  border-radius: 6px;
+  background: var(--verde-escuro);
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.l-botao:hover {
+  background: var(--tinta);
+}
+
+/* ----- 1. Menu ----- */
+.l-menu {
+  border-bottom: 1px solid var(--linha);
+}
+
+.l-menu-linha {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  min-height: 72px;
+}
+
+.l-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.l-marca-folha {
+  width: 22px;
+  height: 18px;
+}
+
+.l-menu-links {
+  display: flex;
+  gap: 28px;
+  font-size: 15px;
+}
+
+.l-menu-links a,
+.l-link-entrar {
+  text-decoration: none;
+  color: var(--suave);
+}
+
+.l-menu-links a:hover,
+.l-link-entrar:hover {
+  color: var(--tinta);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.l-menu-acoes {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 15px;
+}
+
+@media (max-width: 900px) {
+  .l-menu-linha {
+    gap: 20px;
+  }
+  .l-menu-links {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  /* Sem espaço para tudo numa linha: os links descem para baixo da marca. */
+  .l-menu-linha {
+    flex-wrap: wrap;
+    row-gap: 4px;
+    padding-block: 12px;
+  }
+  .l-menu-links {
+    order: 3;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .l-menu-links {
+    display: none;
+  }
+  .l-menu-acoes {
+    gap: 14px;
+  }
+  .l-botao {
+    padding: 10px 14px;
+  }
 }
